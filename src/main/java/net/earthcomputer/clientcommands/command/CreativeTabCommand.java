@@ -71,10 +71,12 @@ public class CreativeTabCommand {
         // FIXME: this is a hack because creative tabs must be registered on startup but item stacks normally can't be
         // parsed until the world is loaded. Use the default registries for now, as most things in item stacks aren't
         // in dynamic registries yet. Fix this once creative tabs can be registered dynamically.
-        var holderLookupProvider = new RegistryAccess.ImmutableRegistryAccess(BuiltInRegistries.REGISTRY.stream().toList());
+        // This only affects the icon of the creative tab and the contents, which is lazily populated and has access to
+        // the dynamic registries.
+        var builtinLookupProvider = new RegistryAccess.ImmutableRegistryAccess(BuiltInRegistries.REGISTRY.stream().toList());
         tabs.forEach((key, tab) -> {
             try {
-                tab.registerCreativeTab(holderLookupProvider, key);
+                tab.registerCreativeTab(builtinLookupProvider, key);
             } catch (Throwable e) {
                 LOGGER.error("Could not load tab {}", key, e);
             }
@@ -323,14 +325,14 @@ public class CreativeTabCommand {
     }
 
     private record Tab(CompoundTag icon, ListTag items) {
-        void registerCreativeTab(HolderLookup.Provider holderLookupProvider, String key) {
+        void registerCreativeTab(HolderLookup.Provider builtinLookupProvider, String key) {
             Registry.register(BuiltInRegistries.CREATIVE_MODE_TAB, ResourceLocation.fromNamespaceAndPath("clientcommands", key), FabricItemGroup.builder()
                     .title(Component.literal(key))
-                    .icon(() -> singleItemFromNbt(holderLookupProvider, icon))
+                    .icon(() -> singleItemFromNbt(builtinLookupProvider, icon))
                     .displayItems((displayContext, entries) -> {
                         Set<ItemStack> existingStacks = ItemStackLinkedSet.createTypeAndComponentsSet();
                         for (int i = 0; i < items.size(); i++) {
-                            ItemStack stack = singleItemFromNbt(holderLookupProvider, items.getCompound(i));
+                            ItemStack stack = singleItemFromNbt(displayContext.holders(), items.getCompound(i));
                             if (stack.isEmpty()) {
                                 continue;
                             }
