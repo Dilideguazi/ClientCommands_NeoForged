@@ -62,6 +62,8 @@
   "commands.ccalcstack.success.empty.exact": "%s items is exactly %s stacks",
   "commands.ccalcstack.success.exact": "%s %s is exactly %s stacks",
 
+  "commands.ccallback.failed": "Unknown or expired callback",
+
   "commands.cconnectfour.name": "Connect Four",
 
   "commands.ccrackrng.failed": "Failed to crack player seed",

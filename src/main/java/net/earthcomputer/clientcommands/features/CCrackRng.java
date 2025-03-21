@@ -34,7 +34,7 @@ public class CCrackRng {
     private static String throwItems() throws CommandSyntaxException {
         LocalPlayer player = Minecraft.getInstance().player;
         assert player != null;
-        player.moveTo(player.getX(), player.getY(), player.getZ(), player.getYRot(), 90);
+        player.snapTo(player.position(), player.getYRot(), 90);
         // point to correct location
         player.connection.send(new ServerboundMovePlayerPacket.Rot(player.getYRot(), 90, player.onGround(), player.horizontalCollision));
         ItemThrowTask task = new ItemThrowTask(NUM_THROWS) {

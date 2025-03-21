@@ -13,6 +13,7 @@ import net.minecraft.world.entity.Entity;
 import net.minecraft.world.entity.EntityType;
 import net.minecraft.world.entity.EquipmentSlot;
 import net.minecraft.world.entity.LivingEntity;
+import net.minecraft.world.entity.item.ItemEntity;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.enchantment.Enchantments;
 import net.minecraft.world.item.equipment.Equippable;
@@ -27,6 +28,7 @@ import org.spongepowered.asm.mixin.Unique;
 import org.spongepowered.asm.mixin.injection.At;
 import org.spongepowered.asm.mixin.injection.Inject;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
+import org.spongepowered.asm.mixin.injection.callback.CallbackInfoReturnable;
 
 @Mixin(LivingEntity.class)
 public abstract class LivingEntityMixin extends Entity {
@@ -38,6 +40,13 @@ public abstract class LivingEntityMixin extends Entity {
 
     public LivingEntityMixin(EntityType<?> entityType_1, Level level_1) {
         super(entityType_1, level_1);
+    }
+
+    @Inject(method = "drop", at = @At(value = "FIELD", target = "Lnet/minecraft/world/level/Level;isClientSide:Z"))
+    private void onDrop(CallbackInfoReturnable<ItemEntity> ci) {
+        if (isThePlayer()) {
+            PlayerRandCracker.onDropItem();
+        }
     }
 
     @Inject(method = "pushEntities", at = @At("HEAD"))

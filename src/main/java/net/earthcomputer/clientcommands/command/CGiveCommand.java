@@ -78,10 +78,10 @@ public class CGiveCommand {
     }
 
     private static int getSlotWithRemainingSpace(Inventory inventory, ItemStack stack, IntList fullSlots) {
-        if (inventory.hasRemainingSpaceForItem(inventory.getItem(inventory.selected), stack) && !fullSlots.contains(inventory.selected)) {
-            return inventory.selected;
+        if (inventory.hasRemainingSpaceForItem(inventory.getItem(inventory.getSelectedSlot()), stack) && !fullSlots.contains(inventory.getSelectedSlot())) {
+            return inventory.getSelectedSlot();
         } else if (inventory.hasRemainingSpaceForItem(inventory.getItem(Inventory.SLOT_OFFHAND), stack) && !fullSlots.contains(Inventory.SLOT_OFFHAND)) {
-            return inventory.selected;
+            return inventory.getSelectedSlot();
         } else {
             for (int slot = 0; slot < Inventory.INVENTORY_SIZE; slot++) {
                 if (inventory.hasRemainingSpaceForItem(inventory.getItem(slot), stack) && !fullSlots.contains(slot)) {

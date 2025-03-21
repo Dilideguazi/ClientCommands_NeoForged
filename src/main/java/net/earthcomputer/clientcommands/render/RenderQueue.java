@@ -1,5 +1,7 @@
 package net.earthcomputer.clientcommands.render;
 
+import com.mojang.blaze3d.pipeline.RenderPipeline;
+import com.mojang.blaze3d.platform.DepthTestFunction;
 import com.mojang.blaze3d.vertex.DefaultVertexFormat;
 import com.mojang.blaze3d.vertex.PoseStack;
 import com.mojang.blaze3d.vertex.VertexConsumer;
@@ -7,7 +9,9 @@ import com.mojang.blaze3d.vertex.VertexFormat;
 import net.fabricmc.fabric.api.client.event.lifecycle.v1.ClientTickEvents;
 import net.fabricmc.fabric.api.client.rendering.v1.WorldRenderEvents;
 import net.minecraft.client.Minecraft;
+import net.minecraft.client.renderer.RenderPipelines;
 import net.minecraft.client.renderer.RenderType;
+import net.minecraft.resources.ResourceLocation;
 import net.minecraft.world.phys.AABB;
 import net.minecraft.world.phys.Vec3;
 
@@ -26,6 +30,19 @@ public class RenderQueue {
     private static final List<RemoveQueueEntry> removeQueue = new ArrayList<>();
     private static final EnumMap<Layer, Map<Object, Shape>> queue = new EnumMap<>(Layer.class);
 
+    private static final RenderPipeline NO_DEPTH_PIPELINE = RenderPipeline.builder(RenderPipelines.MATRICES_COLOR_SNIPPET)
+        .withLocation(ResourceLocation.fromNamespaceAndPath("clientcommands", "pipeline/no_depth"))
+        .withVertexShader("core/position_color")
+        .withFragmentShader("core/position_color")
+        .withCull(false)
+        .withDepthTestFunction(DepthTestFunction.NO_DEPTH_TEST)
+        .withVertexFormat(DefaultVertexFormat.POSITION_COLOR, VertexFormat.Mode.DEBUG_LINE_STRIP)
+        .build();
+    public static final RenderType NO_DEPTH_LAYER = RenderType.create("clientcommands_no_depth", 3 * 512, NO_DEPTH_PIPELINE, RenderType.CompositeState.builder()
+        .setLayeringState(RenderType.VIEW_OFFSET_Z_LAYERING)
+        .setLineState(new RenderType.LineStateShard(OptionalDouble.of(Line.THICKNESS)))
+        .createCompositeState(true));
+
     static {
         ClientTickEvents.START_CLIENT_TICK.register(RenderQueue::tick);
         WorldRenderEvents.AFTER_ENTITIES.register(context -> {
@@ -37,6 +54,12 @@ public class RenderQueue {
 
             context.matrixStack().popPose();
         });
+
+        RenderPipelines.register(NO_DEPTH_PIPELINE);
+    }
+
+    public static void register() {
+        // load class
     }
 
     public static void add(Layer layer, Object key, Shape shape, int life) {
@@ -112,13 +135,4 @@ public class RenderQueue {
     private record AddQueueEntry(Layer layer, Object key, Shape shape, int life) {}
 
     private record RemoveQueueEntry(Layer layer, Object key) {}
-
-    public static final RenderType NO_DEPTH_LAYER = RenderType.create("clientcommands_no_depth", DefaultVertexFormat.POSITION_COLOR_NORMAL, VertexFormat.Mode.LINES, 256, true, true, RenderType.CompositeState.builder()
-            .setShaderState(RenderType.RENDERTYPE_LINES_SHADER)
-            .setWriteMaskState(RenderType.COLOR_WRITE)
-            .setCullState(RenderType.NO_CULL)
-            .setDepthTestState(RenderType.NO_DEPTH_TEST)
-            .setLayeringState(RenderType.VIEW_OFFSET_Z_LAYERING)
-            .setLineState(new RenderType.LineStateShard(OptionalDouble.of(Line.THICKNESS)))
-            .createCompositeState(true));
 }

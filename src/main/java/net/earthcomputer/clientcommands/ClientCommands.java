@@ -14,6 +14,7 @@ import net.earthcomputer.clientcommands.features.FishingCracker;
 import net.earthcomputer.clientcommands.features.PlayerRandCracker;
 import net.earthcomputer.clientcommands.features.Relogger;
 import net.earthcomputer.clientcommands.features.ServerBrandManager;
+import net.earthcomputer.clientcommands.render.RenderQueue;
 import net.earthcomputer.clientcommands.util.MappingsHelper;
 import net.fabricmc.api.ClientModInitializer;
 import net.fabricmc.fabric.api.client.command.v2.ClientCommandRegistrationCallback;
@@ -50,6 +51,8 @@ public class ClientCommands implements ClientModInitializer {
 
     @Override
     public void onInitializeClient() {
+        RenderQueue.register();
+
         setupScrambleWindowTitle();
 
         // Config
@@ -126,6 +129,7 @@ public class ClientCommands implements ClientModInitializer {
         BuildInfoCommand.register(dispatcher);
         CalcCommand.register(dispatcher);
         CalcStackCommand.register(dispatcher, context);
+        CallbackCommand.register(dispatcher);
         CDebugCommand.register(dispatcher);
         CEnchantCommand.register(dispatcher, context);
         CFunctionCommand.register(dispatcher);

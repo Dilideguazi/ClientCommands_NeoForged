@@ -334,9 +334,9 @@ public class FishingCracker {
 
             onFishingBobberEntity();
         });
-        MoreClientEntityEvents.POST_ADD_XP_ORB.register(packet -> {
+        MoreClientEntityEvents.POST_SET_INITIAL_XP_ORB_VALUE.register(orb -> {
             if (canManipulateFishing()) {
-                processExperienceOrbSpawn(packet.getX(), packet.getY(), packet.getZ(), packet.getValue());
+                processExperienceOrbSpawn(orb.getX(), orb.getY(), orb.getZ(), orb.getValue());
             }
         });
         MoreClientEvents.TIME_SYNC_ON_NETWORK_THREAD.register(packet -> {
@@ -939,7 +939,7 @@ public class FishingCracker {
         }
 
         public List<Catch> generateLoot() {
-            fakeEntity.absMoveTo(pos.x, pos.y, pos.z);
+            fakeEntity.absSnapTo(pos.x, pos.y, pos.z);
             fakeEntity.setDeltaMovement(velocity);
 
             LootContext lootContext = getLootContext();
@@ -1143,7 +1143,7 @@ public class FishingCracker {
         }
 
         private void checkForCollision() {
-            fakeEntity.absMoveTo(pos.x, pos.y, pos.z);
+            fakeEntity.absSnapTo(pos.x, pos.y, pos.z);
             fakeEntity.setDeltaMovement(velocity);
             HitResult hitResult = ProjectileUtil.getHitResultOnMoveVector(fakeEntity, fakeEntity::canHitEntity);
             if (hitResult.getType() != HitResult.Type.MISS) {
@@ -1193,7 +1193,7 @@ public class FishingCracker {
 
         private Vec3 adjustMovementForCollisions(Vec3 movement) {
             AABB aabb = this.boundingBox;
-            fakeEntity.absMoveTo(pos.x, pos.y, pos.z);
+            fakeEntity.absSnapTo(pos.x, pos.y, pos.z);
             fakeEntity.setDeltaMovement(velocity);
             assert level != null;
 

@@ -157,7 +157,7 @@ public class EnchantmentCracker {
             if (enchs != null) {
                 sortIntoTooltipOrder(level.registryAccess().lookupOrThrow(Registries.ENCHANTMENT), enchs);
                 for (EnchantmentInstance ench : enchs) {
-                    lines.add("   " + Enchantment.getFullname(ench.enchantment, ench.level).getString());
+                    lines.add("   " + Enchantment.getFullname(ench.enchantment(), ench.level()).getString());
                 }
             }
         }
@@ -256,8 +256,8 @@ public class EnchantmentCracker {
                     } else {
                         // check the right enchantment clue was generated
                         EnchantmentInstance clue = enchantments.get(rand.nextInt(enchantments.size()));
-                        if (enchantmentIdMap.getId(clue.enchantment) != actualEnchantmentClues[slot]
-                                || clue.level != actualLevelClues[slot]) {
+                        if (enchantmentIdMap.getId(clue.enchantment()) != actualEnchantmentClues[slot]
+                                || clue.level() != actualLevelClues[slot]) {
                             xpSeedItr.remove();
                             continue seedLoop;
                         }
@@ -457,7 +457,7 @@ public class EnchantmentCracker {
                     int timesNeeded = finalResult.itemThrows();
                     if (timesNeeded != ManipulateResult.NO_DUMMY) {
                         if (timesNeeded != 0) {
-                            player.moveTo(player.getX(), player.getY(), player.getZ(), player.getYRot(), 90);
+                            player.snapTo(player.getX(), player.getY(), player.getZ(), player.getYRot(), 90);
                             // sync rotation to server before we throw any items
                             player.connection.send(new ServerboundMovePlayerPacket.Rot(player.getYRot(), 90, player.onGround(), player.horizontalCollision));
                             Configs.playerCrackState = PlayerRandCracker.CrackState.MANIPULATING_ENCHANTMENTS;
@@ -655,7 +655,7 @@ public class EnchantmentCracker {
             tooltipIndex.put(ench, index++);
         }
 
-        list.sort(Comparator.comparingInt(ench -> tooltipIndex.getInt(ench.enchantment)));
+        list.sort(Comparator.comparingInt(ench -> tooltipIndex.getInt(ench.enchantment())));
     }
 
     public record ManipulateResult(int itemThrows, int bookshelves, int slot, List<EnchantmentInstance> enchantments) {

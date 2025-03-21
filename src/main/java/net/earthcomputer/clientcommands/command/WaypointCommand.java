@@ -12,7 +12,8 @@ import com.mojang.serialization.Dynamic;
 import net.earthcomputer.clientcommands.ClientCommands;
 import net.earthcomputer.clientcommands.render.RenderQueue;
 import net.fabricmc.fabric.api.client.command.v2.FabricClientCommandSource;
-import net.fabricmc.fabric.api.client.rendering.v1.HudRenderCallback;
+import net.fabricmc.fabric.api.client.rendering.v1.HudLayerRegistrationCallback;
+import net.fabricmc.fabric.api.client.rendering.v1.IdentifiedLayer;
 import net.fabricmc.fabric.api.client.rendering.v1.WorldRenderContext;
 import net.fabricmc.fabric.api.client.rendering.v1.WorldRenderEvents;
 import net.minecraft.ChatFormatting;
@@ -32,13 +33,12 @@ import net.minecraft.core.BlockPos;
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.nbt.NbtIo;
 import net.minecraft.nbt.NbtOps;
-import net.minecraft.nbt.NbtUtils;
-import net.minecraft.nbt.Tag;
 import net.minecraft.network.chat.ClickEvent;
 import net.minecraft.network.chat.Component;
 import net.minecraft.network.chat.ComponentUtils;
 import net.minecraft.network.chat.HoverEvent;
 import net.minecraft.resources.ResourceKey;
+import net.minecraft.resources.ResourceLocation;
 import net.minecraft.world.entity.Entity;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.phys.AABB;
@@ -66,6 +66,7 @@ import static dev.xpple.clientarguments.arguments.CDimensionArgument.*;
 import static net.fabricmc.fabric.api.client.command.v2.ClientCommandManager.*;
 
 public class WaypointCommand {
+    private static final ResourceLocation HUD_LAYER_ID = ResourceLocation.fromNamespaceAndPath("clientcommands", "waypoints");
 
     private static final Map<String, Map<String, WaypointLocation>> waypoints = new HashMap<>();
 
@@ -229,8 +230,7 @@ public class WaypointCommand {
             waypoints.forEach((worldIdentifier, worldWaypoints) -> compoundTag.put(worldIdentifier, worldWaypoints.entrySet().stream()
                 .collect(CompoundTag::new, (result, entry) -> {
                     CompoundTag waypoint = new CompoundTag();
-                    Tag pos = NbtUtils.writeBlockPos(entry.getValue().location());
-                    waypoint.put("pos", pos);
+                    waypoint.store("pos", BlockPos.CODEC, entry.getValue().location());
                     String dimension = entry.getValue().dimension().location().toString();
                     waypoint.putString("Dimension", dimension);
                     result.put(entry.getKey(), waypoint);
@@ -259,13 +259,13 @@ public class WaypointCommand {
     public static Map<String, Map<String, WaypointLocation>> deserializeWaypoints(CompoundTag rootTag) {
         Map<String, Map<String, WaypointLocation>> waypoints = new HashMap<>();
 
-        CompoundTag compoundTag = rootTag.getCompound("Waypoints");
-        compoundTag.getAllKeys().forEach(worldIdentifier -> {
-            CompoundTag worldWaypoints = compoundTag.getCompound(worldIdentifier);
-            waypoints.put(worldIdentifier, worldWaypoints.getAllKeys().stream()
+        CompoundTag compoundTag = rootTag.getCompoundOrEmpty("Waypoints");
+        compoundTag.keySet().forEach(worldIdentifier -> {
+            CompoundTag worldWaypoints = compoundTag.getCompoundOrEmpty(worldIdentifier);
+            waypoints.put(worldIdentifier, worldWaypoints.keySet().stream()
                 .collect(Collectors.toMap(Function.identity(), name -> {
-                    CompoundTag waypoint = worldWaypoints.getCompound(name);
-                    BlockPos pos = NbtUtils.readBlockPos(waypoint, "pos").orElseThrow();
+                    CompoundTag waypoint = worldWaypoints.getCompoundOrEmpty(name);
+                    BlockPos pos = waypoint.read("pos", BlockPos.CODEC).orElseThrow();
                     ResourceKey<Level> dimension = Level.RESOURCE_KEY_CODEC.parse(new Dynamic<>(NbtOps.INSTANCE, waypoint.get("Dimension"))).resultOrPartial(LOGGER::error).orElseThrow();
                     return new WaypointLocation(dimension, pos);
                 })));
@@ -277,13 +277,13 @@ public class WaypointCommand {
     private static Component formatCoordinates(BlockPos waypoint) {
         return ComponentUtils.wrapInSquareBrackets(Component.literal(waypoint.toShortString())).withStyle(style -> style
             .withColor(ChatFormatting.GREEN)
-            .withClickEvent(new ClickEvent(ClickEvent.Action.COPY_TO_CLIPBOARD, waypoint.getX() + " " + waypoint.getY() + " " + waypoint.getZ()))
-            .withHoverEvent(new HoverEvent(HoverEvent.Action.SHOW_TEXT, Component.translatable("chat.copy.click")))
+            .withClickEvent(new ClickEvent.CopyToClipboard(waypoint.getX() + " " + waypoint.getY() + " " + waypoint.getZ()))
+            .withHoverEvent(new HoverEvent.ShowText(Component.translatable("chat.copy.click")))
         );
     }
 
     public static void registerEvents() {
-        HudRenderCallback.EVENT.register(WaypointCommand::renderWaypointLabels);
+        HudLayerRegistrationCallback.EVENT.register(drawerWrapper -> drawerWrapper.addLayer(IdentifiedLayer.of(HUD_LAYER_ID, WaypointCommand::renderWaypointLabels)));
         WorldRenderEvents.AFTER_ENTITIES.register(WaypointCommand::renderWaypointBoxes);
     }
 

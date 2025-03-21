@@ -6,9 +6,6 @@ accessible field net/minecraft/client/multiplayer/AccountProfileKeyPairManager k
 # Command Handling
 accessible field net/minecraft/client/gui/Gui overlayMessageTime I
 accessible field net/minecraft/client/gui/components/CommandSuggestions ARGUMENT_STYLES Ljava/util/List;
-accessible field net/minecraft/network/chat/HoverEvent$Action legacyCodec Lcom/mojang/serialization/MapCodec;
-accessible method net/minecraft/network/chat/HoverEvent <init> (Lnet/minecraft/network/chat/HoverEvent$TypedHoverEvent;)V
-accessible class net/minecraft/network/chat/HoverEvent$TypedHoverEvent
 
 # Data Query Handler
 accessible field net/minecraft/client/DebugQueryHandler transactionId I
@@ -26,6 +23,9 @@ accessible method net/minecraft/world/entity/player/Inventory hasRemainingSpaceF
 
 # chat
 accessible method net/minecraft/client/Minecraft openChatScreen (Ljava/lang/String;)V
+
+# ckit
+accessible field net/minecraft/world/entity/LivingEntity equipment Lnet/minecraft/world/entity/EntityEquipment;
 
 # clisten
 accessible field net/minecraft/network/Connection channel Lio/netty/channel/Channel;
@@ -47,8 +47,11 @@ accessible field net/minecraft/client/OptionInstance value Ljava/lang/Object;
 accessible field net/minecraft/client/gui/components/EditBox maxLength I
 
 # Render Queue
-accessible class net/minecraft/client/renderer/RenderType$CompositeState
-accessible class net/minecraft/client/renderer/RenderStateShard$LineStateShard
+accessible field net/minecraft/client/renderer/RenderPipelines MATRICES_COLOR_SNIPPET Lcom/mojang/blaze3d/pipeline/RenderPipeline$Snippet;
+accessible method net/minecraft/client/renderer/RenderPipelines register (Lcom/mojang/blaze3d/pipeline/RenderPipeline;)Lcom/mojang/blaze3d/pipeline/RenderPipeline;
+accessible method net/minecraft/client/renderer/RenderType$CompositeState$CompositeStateBuilder createCompositeState (Z)Lnet/minecraft/client/renderer/RenderType$CompositeState;
+accessible method net/minecraft/client/renderer/RenderType$CompositeState$CompositeStateBuilder setLayeringState (Lnet/minecraft/client/renderer/RenderStateShard$LayeringStateShard;)Lnet/minecraft/client/renderer/RenderType$CompositeState$CompositeStateBuilder;
+accessible method net/minecraft/client/renderer/RenderType$CompositeState$CompositeStateBuilder setLineState (Lnet/minecraft/client/renderer/RenderStateShard$LineStateShard;)Lnet/minecraft/client/renderer/RenderType$CompositeState$CompositeStateBuilder;
 
 # RNG Events
 accessible method net/minecraft/world/entity/Entity isInvulnerableToBase (Lnet/minecraft/world/damagesource/DamageSource;)Z

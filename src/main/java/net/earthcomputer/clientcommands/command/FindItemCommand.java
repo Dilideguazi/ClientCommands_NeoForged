@@ -27,7 +27,6 @@ import net.minecraft.core.Direction;
 import net.minecraft.core.component.DataComponents;
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.nbt.ListTag;
-import net.minecraft.nbt.Tag;
 import net.minecraft.network.chat.Component;
 import net.minecraft.util.Mth;
 import net.minecraft.world.Container;
@@ -134,8 +133,8 @@ public class FindItemCommand {
 
             int result = 0;
             for (int i = 0; i < inventory.size(); i++) {
-                CompoundTag compound = inventory.getCompound(i);
-                ItemStack stack = ItemStack.parseOptional(level.registryAccess(), compound);
+                CompoundTag compound = inventory.getCompoundOrEmpty(i);
+                ItemStack stack = ItemStack.parse(level.registryAccess(), compound).orElse(ItemStack.EMPTY);
                 if (searchingFor.test(stack)) {
                     result += stack.getCount();
                 }
@@ -431,8 +430,8 @@ public class FindItemCommand {
                         currentlySearchingTimeout = NO_RESPONSE_TIMEOUT;
                         ClientcommandsDataQueryHandler.get(packetListener).queryEntityNbt(entity.getId(), entityNbt -> {
                             waitingOnEntities.remove(entity.getUUID());
-                            if (!entity.isRemoved() && entityNbt != null && entityNbt.contains("Items", Tag.TAG_LIST)) {
-                                int count = countItems(entityNbt.getList("Items", Tag.TAG_COMPOUND));
+                            if (!entity.isRemoved() && entityNbt != null && entityNbt.contains("Items")) {
+                                int count = countItems(entityNbt.getListOrEmpty("Items"));
                                 if (count > 0) {
                                     totalFound += count;
                                     printEntityLocation(entity, count);
@@ -531,8 +530,8 @@ public class FindItemCommand {
                             currentlySearchingTimeout = NO_RESPONSE_TIMEOUT;
                             ClientcommandsDataQueryHandler.get(packetListener).queryEntityNbt(player.getId(), playerNbt -> {
                                 int numItemsInEnderChest = 0;
-                                if (playerNbt != null && playerNbt.contains("EnderItems", Tag.TAG_LIST)) {
-                                    numItemsInEnderChest = countItems(playerNbt.getList("EnderItems", Tag.TAG_COMPOUND));
+                                if (playerNbt != null && playerNbt.contains("EnderItems")) {
+                                    numItemsInEnderChest = countItems(playerNbt.getListOrEmpty("EnderItems"));
                                 }
                                 this.numItemsInEnderChest = numItemsInEnderChest;
                                 totalFound += numItemsInEnderChest;
@@ -553,8 +552,8 @@ public class FindItemCommand {
                         currentlySearchingTimeout = NO_RESPONSE_TIMEOUT;
                         ClientcommandsDataQueryHandler.get(packetListener).queryBlockNbt(currentPos, blockNbt -> {
                             waitingOnBlocks.remove(currentPos);
-                            if (blockNbt != null && blockNbt.contains("Items", Tag.TAG_LIST)) {
-                                int count = countItems(blockNbt.getList("Items", Tag.TAG_COMPOUND));
+                            if (blockNbt != null && blockNbt.contains("Items")) {
+                                int count = countItems(blockNbt.getListOrEmpty("Items"));
                                 if (count > 0) {
                                     totalFound += count;
                                     printLocation(currentPos, count);

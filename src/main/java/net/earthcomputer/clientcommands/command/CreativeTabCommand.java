@@ -209,7 +209,7 @@ public class CreativeTabCommand {
 
         Tab tab = tabs.get(name);
         ListTag items = tab.items();
-        ItemStack old = ItemStack.parseOptional(source.registryAccess(), tab.icon());
+        ItemStack old = ItemStack.parse(source.registryAccess(), tab.icon()).orElse(ItemStack.EMPTY);
 
         tabs.put(name, new Tab((CompoundTag) icon.save(source.registryAccess()), items));
 
@@ -262,62 +262,64 @@ public class CreativeTabCommand {
 
     private static void loadFile() throws IOException {
         tabs.clear();
-        CompoundTag rootTag = NbtIo.read(configPath.resolve("creative_tabs.dat"));
-        if (rootTag == null) {
+        CompoundTag rootTagTmp = NbtIo.read(configPath.resolve("creative_tabs.dat"));
+        if (rootTagTmp == null) {
             try {
                 Files.move(configPath.resolve("groups.dat"), configPath.resolve("creative_tabs.dat"));
             } catch (NoSuchFileException e) {
                 return;
             }
-            rootTag = NbtIo.read(configPath.resolve("creative_tabs.dat"));
-            if (rootTag == null) {
+            rootTagTmp = NbtIo.read(configPath.resolve("creative_tabs.dat"));
+            if (rootTagTmp == null) {
                 return;
             }
         }
+        CompoundTag rootTag = rootTagTmp;
         final int currentVersion = SharedConstants.getCurrentVersion().getDataVersion().getVersion();
-        final int fileVersion = rootTag.getInt("DataVersion");
-        CompoundTag compoundTag = rootTag.getCompound("CreativeTabs");
-        if (compoundTag.isEmpty()) {
-            compoundTag = rootTag.getCompound("Groups");
-        }
+        final int fileVersion = rootTag.getIntOr("DataVersion", 99);
+        CompoundTag compoundTag = rootTag.getCompound("CreativeTabs").orElseGet(() -> rootTag.getCompoundOrEmpty("Groups"));
         DataFixer dataFixer = Minecraft.getInstance().getFixerUpper();
         if (fileVersion >= currentVersion) {
-            for (String key : compoundTag.getAllKeys()) {
-                if (ResourceLocation.tryParse("clientcommands:" + key) == null) {
-                    LOGGER.warn("Skipping creative tab with invalid name {}", key);
+            for (var entry : compoundTag.entrySet()) {
+                if (ResourceLocation.tryParse("clientcommands:" + entry.getKey()) == null) {
+                    LOGGER.warn("Skipping creative tab with invalid name {}", entry.getKey());
                     return;
                 }
 
-                CompoundTag tab = compoundTag.getCompound(key);
-                CompoundTag icon = tab.getCompound("icon");
-                ListTag items = tab.getList("items", Tag.TAG_COMPOUND);
-                tabs.put(key, new Tab(icon, items));
+                if (!(entry.getValue() instanceof CompoundTag tab)) {
+                    continue;
+                }
+                CompoundTag icon = tab.getCompoundOrEmpty("icon");
+                ListTag items = tab.getListOrEmpty("items");
+                tabs.put(entry.getKey(), new Tab(icon, items));
             }
         } else {
-            for (String key : compoundTag.getAllKeys()) {
-                if (ResourceLocation.tryParse("clientcommands:" + key) == null) {
-                    LOGGER.warn("Skipping creative tab with invalid name {}", key);
+            for (var entry : compoundTag.entrySet()) {
+                if (ResourceLocation.tryParse("clientcommands:" + entry.getKey()) == null) {
+                    LOGGER.warn("Skipping creative tab with invalid name {}", entry.getKey());
                     return;
                 }
 
-                CompoundTag tab = compoundTag.getCompound(key);
-                Dynamic<Tag> oldStackDynamic = new Dynamic<>(NbtOps.INSTANCE, tab.getCompound("icon"));
+                if (!(entry.getValue() instanceof CompoundTag tab)) {
+                    continue;
+                }
+                Dynamic<Tag> oldStackDynamic = new Dynamic<>(NbtOps.INSTANCE, tab.getCompoundOrEmpty("icon"));
                 Dynamic<Tag> newStackDynamic = dataFixer.update(References.ITEM_STACK, oldStackDynamic, fileVersion, currentVersion);
                 CompoundTag icon = (CompoundTag) newStackDynamic.getValue();
 
                 ListTag updatedListTag = new ListTag();
-                tab.getList("items", Tag.TAG_COMPOUND).forEach(tag -> {
+                tab.getListOrEmpty("items").forEach(tag -> {
                     Dynamic<Tag> oldTagDynamic = new Dynamic<>(NbtOps.INSTANCE, tag);
                     Dynamic<Tag> newTagDynamic = dataFixer.update(References.ITEM_STACK, oldTagDynamic, fileVersion, currentVersion);
                     updatedListTag.add(newTagDynamic.getValue());
                 });
-                tabs.put(key, new Tab(icon, updatedListTag));
+                tabs.put(entry.getKey(), new Tab(icon, updatedListTag));
             }
         }
     }
 
     private static ItemStack singleItemFromNbt(HolderLookup.Provider holderLookupProvider, CompoundTag nbt) {
-        ItemStack stack = ItemStack.parseOptional(holderLookupProvider, nbt);
+        ItemStack stack = ItemStack.parse(holderLookupProvider, nbt).orElse(ItemStack.EMPTY);
         if (!stack.isEmpty()) {
             stack.setCount(1);
         }
@@ -332,7 +334,7 @@ public class CreativeTabCommand {
                     .displayItems((displayContext, entries) -> {
                         Set<ItemStack> existingStacks = ItemStackLinkedSet.createTypeAndComponentsSet();
                         for (int i = 0; i < items.size(); i++) {
-                            ItemStack stack = singleItemFromNbt(displayContext.holders(), items.getCompound(i));
+                            ItemStack stack = singleItemFromNbt(displayContext.holders(), items.getCompoundOrEmpty(i));
                             if (stack.isEmpty()) {
                                 continue;
                             }

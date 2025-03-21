@@ -62,7 +62,7 @@ public class LookCommand {
     }
 
     private static int doLook(LocalPlayer player, float yaw, float pitch) {
-        player.moveTo(player.getX(), player.getY(), player.getZ(), yaw, pitch);
+        player.moveOrInterpolateTo(player.position(), yaw, pitch);
         return Command.SINGLE_SUCCESS;
     }
 

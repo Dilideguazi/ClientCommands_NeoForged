@@ -130,7 +130,7 @@ public class KitCommand {
             throw NOT_FOUND_EXCEPTION.create(name);
         }
 
-        Inventory tempInv = new Inventory(source.getPlayer());
+        Inventory tempInv = new Inventory(source.getPlayer(), source.getPlayer().equipment);
         tempInv.load(kit);
         List<Slot> slots = source.getPlayer().inventoryMenu.slots;
         for (int i = 0; i < slots.size(); i++) {
@@ -164,7 +164,7 @@ public class KitCommand {
             throw NOT_FOUND_EXCEPTION.create(name);
         }
 
-        Inventory tempInv = new Inventory(source.getPlayer());
+        Inventory tempInv = new Inventory(source.getPlayer(), source.getPlayer().equipment);
         tempInv.load(kit);
         /*
             After executing a command, the current screen will be closed (the chat hud).
@@ -200,15 +200,15 @@ public class KitCommand {
             return;
         }
         final int currentVersion = SharedConstants.getCurrentVersion().getDataVersion().getVersion();
-        final int fileVersion = rootTag.getInt("DataVersion");
-        CompoundTag compoundTag = rootTag.getCompound("Kits");
+        final int fileVersion = rootTag.getIntOr("DataVersion", 0);
+        CompoundTag compoundTag = rootTag.getCompoundOrEmpty("Kits");
         DataFixer dataFixer = Minecraft.getInstance().getFixerUpper();
         if (fileVersion >= currentVersion) {
-            compoundTag.getAllKeys().forEach(key -> kits.put(key, compoundTag.getList(key, Tag.TAG_COMPOUND)));
+            compoundTag.keySet().forEach(key -> kits.put(key, compoundTag.getListOrEmpty(key)));
         } else {
-            compoundTag.getAllKeys().forEach(key -> {
+            compoundTag.keySet().forEach(key -> {
                 ListTag updatedListTag = new ListTag();
-                compoundTag.getList(key, Tag.TAG_COMPOUND).forEach(tag -> {
+                compoundTag.getListOrEmpty(key).forEach(tag -> {
                     Dynamic<Tag> oldTagDynamic = new Dynamic<>(NbtOps.INSTANCE, tag);
                     Dynamic<Tag> newTagDynamic = dataFixer.update(References.ITEM_STACK, oldTagDynamic, fileVersion, currentVersion);
                     updatedListTag.add(newTagDynamic.getValue());

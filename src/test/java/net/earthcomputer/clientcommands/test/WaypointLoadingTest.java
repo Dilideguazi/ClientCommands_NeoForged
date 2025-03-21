@@ -23,7 +23,7 @@ public final class WaypointLoadingTest {
 
     private static CompoundTag parseSnbt(String snbt) {
         try {
-            return new TagParser(new StringReader(snbt)).readStruct();
+            return TagParser.parseCompoundAsArgument(new StringReader(snbt));
         } catch (CommandSyntaxException e) {
             throw new AssertionError(e);
         }

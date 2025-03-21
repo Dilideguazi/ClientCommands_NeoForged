@@ -10,6 +10,7 @@ import net.earthcomputer.clientcommands.interfaces.ICreativeSlot;
 import net.minecraft.ChatFormatting;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.player.LocalPlayer;
+import net.minecraft.core.component.DataComponents;
 import net.minecraft.network.chat.Component;
 import net.minecraft.network.chat.MutableComponent;
 import net.minecraft.sounds.SoundEvents;
@@ -17,7 +18,6 @@ import net.minecraft.util.StringRepresentable;
 import net.minecraft.world.entity.LivingEntity;
 import net.minecraft.world.inventory.ClickType;
 import net.minecraft.world.inventory.Slot;
-import net.minecraft.world.item.ArmorItem;
 import net.minecraft.world.item.Item;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.ItemUseAnimation;
@@ -26,6 +26,7 @@ import net.minecraft.world.item.component.Consumable;
 import net.minecraft.world.item.enchantment.EnchantmentEffectComponents;
 import net.minecraft.world.item.enchantment.EnchantmentHelper;
 import net.minecraft.world.item.enchantment.Enchantments;
+import net.minecraft.world.item.equipment.Equippable;
 import net.minecraft.world.phys.Vec3;
 import org.jetbrains.annotations.Nullable;
 
@@ -282,7 +283,9 @@ public class PlayerRandCracker {
     public static void onUnbreaking(ItemStack stack, int amount, int unbreakingLevel) {
         if (canMaintainPlayerRNG()) {
             for (int i = 0; i < amount; i++) {
-                if (!(stack.getItem() instanceof ArmorItem) || nextFloat() >= 0.6) {
+                Equippable equippableComponent = stack.get(DataComponents.EQUIPPABLE);
+                boolean isArmor = equippableComponent != null && equippableComponent.damageOnHurt();
+                if (!isArmor || nextFloat() >= 0.6) {
                     nextInt(unbreakingLevel + 1);
                 } else {
                     resetCracker("unbreaking");
@@ -326,7 +329,9 @@ public class PlayerRandCracker {
                         int unbreakingLevel_f = unbreakingLevel;
                         Runnable action = () -> throwItemsUntil(rand -> {
                             for (int i = 0; i < amount; i++) {
-                                if (stack.getItem() instanceof ArmorItem && rand.nextFloat() < 0.6) {
+                                Equippable equippableComponent = stack.get(DataComponents.EQUIPPABLE);
+                                boolean isArmor = equippableComponent != null && equippableComponent.damageOnHurt();
+                                if (isArmor && rand.nextFloat() < 0.6) {
                                     return false;
                                 }
                                 if (rand.nextInt(unbreakingLevel_f + 1) == 0) {
