@@ -30,18 +30,16 @@ public class RenderQueue {
     private static final List<RemoveQueueEntry> removeQueue = new ArrayList<>();
     private static final EnumMap<Layer, Map<Object, Shape>> queue = new EnumMap<>(Layer.class);
 
-    private static final RenderPipeline NO_DEPTH_PIPELINE = RenderPipeline.builder(RenderPipelines.MATRICES_COLOR_SNIPPET)
-        .withLocation(ResourceLocation.fromNamespaceAndPath("clientcommands", "pipeline/no_depth"))
-        .withVertexShader("core/position_color")
-        .withFragmentShader("core/position_color")
-        .withCull(false)
-        .withDepthTestFunction(DepthTestFunction.NO_DEPTH_TEST)
-        .withVertexFormat(DefaultVertexFormat.POSITION_COLOR, VertexFormat.Mode.DEBUG_LINE_STRIP)
-        .build();
-    public static final RenderType NO_DEPTH_LAYER = RenderType.create("clientcommands_no_depth", 3 * 512, NO_DEPTH_PIPELINE, RenderType.CompositeState.builder()
+    private static final RenderPipeline LINES_NO_DEPTH_PIPELINE = RenderPipelines.register(
+        RenderPipeline.builder(RenderPipelines.LINES_SNIPPET)
+            .withLocation(ResourceLocation.fromNamespaceAndPath("clientcommands", "pipeline/lines_no_depth"))
+            .withDepthTestFunction(DepthTestFunction.NO_DEPTH_TEST)
+            .build()
+    );
+    public static final RenderType LINES_NO_DEPTH_LAYER = RenderType.create("clientcommands_no_depth", 3 * 512, LINES_NO_DEPTH_PIPELINE, RenderType.CompositeState.builder()
         .setLayeringState(RenderType.VIEW_OFFSET_Z_LAYERING)
         .setLineState(new RenderType.LineStateShard(OptionalDouble.of(Line.THICKNESS)))
-        .createCompositeState(true));
+        .createCompositeState(false));
 
     static {
         ClientTickEvents.START_CLIENT_TICK.register(RenderQueue::tick);
@@ -50,12 +48,10 @@ public class RenderQueue {
 
             Vec3 cameraPos = context.camera().getPosition();
             context.matrixStack().translate(-cameraPos.x, -cameraPos.y, -cameraPos.z);
-            RenderQueue.render(RenderQueue.Layer.ON_TOP, Objects.requireNonNull(context.consumers()).getBuffer(RenderQueue.NO_DEPTH_LAYER), context.matrixStack(), context.tickCounter().getRealtimeDeltaTicks());
+            RenderQueue.render(RenderQueue.Layer.ON_TOP, Objects.requireNonNull(context.consumers()).getBuffer(RenderQueue.LINES_NO_DEPTH_LAYER), context.matrixStack(), context.tickCounter().getRealtimeDeltaTicks());
 
             context.matrixStack().popPose();
         });
-
-        RenderPipelines.register(NO_DEPTH_PIPELINE);
     }
 
     public static void register() {

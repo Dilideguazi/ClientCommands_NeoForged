@@ -405,7 +405,7 @@ public class WaypointCommand {
             stack.translate(cameraPosition.scale(-1));
 
             AABB box = new AABB(waypointLocation);
-            ShapeRenderer.renderLineBox(stack, context.consumers().getBuffer(RenderQueue.NO_DEPTH_LAYER), box, 1, 1, 1, 1);
+            ShapeRenderer.renderLineBox(stack, context.consumers().getBuffer(RenderQueue.LINES_NO_DEPTH_LAYER), box, 1, 1, 1, 1);
 
             stack.translate(waypointLocation.getCenter().add(new Vec3(0, 1, 0)));
             stack.mulPose(context.camera().rotation());
