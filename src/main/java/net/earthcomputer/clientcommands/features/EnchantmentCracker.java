@@ -612,33 +612,37 @@ public class EnchantmentCracker {
 
     // Same as above method, except does not assume the seed has been cracked. If it
     // hasn't returns the clue given by the server
+    @Nullable
     public static List<EnchantmentInstance> getEnchantmentsInTable(int slot) {
         LocalPlayer player = Minecraft.getInstance().player;
         assert player != null;
         Registry<Enchantment> enchantmentRegistry = player.registryAccess().lookupOrThrow(Registries.ENCHANTMENT);
 
         CrackState crackState = Configs.enchCrackState;
-        EnchantmentMenu enchContainer = (EnchantmentMenu) player.containerMenu;
+
+        if (!(player.containerMenu instanceof EnchantmentMenu enchMenu)) {
+            return null;
+        }
 
         if (crackState != CrackState.CRACKED) {
-            if (enchContainer.enchantClue[slot] == -1) {
+            if (enchMenu.enchantClue[slot] == -1) {
                 // if we haven't cracked it, and there's no clue, then we can't give any
                 // information about the enchantment
                 return null;
             } else {
                 // return a list containing the clue
-                Holder<Enchantment> enchantment = enchantmentRegistry.asHolderIdMap().byId(enchContainer.enchantClue[slot]);
+                Holder<Enchantment> enchantment = enchantmentRegistry.asHolderIdMap().byId(enchMenu.enchantClue[slot]);
                 if (enchantment == null) {
                     return null;
                 }
-                return new ArrayList<>(Collections.singletonList(new EnchantmentInstance(enchantment, enchContainer.levelClue[slot])));
+                return new ArrayList<>(Collections.singletonList(new EnchantmentInstance(enchantment, enchMenu.levelClue[slot])));
             }
         } else {
             // return the enchantments using our cracked seed
             RandomSource rand = RandomSource.create();
             int xpSeed = possibleXPSeeds.iterator().next();
-            ItemStack enchantingStack = enchContainer.getSlot(0).getItem();
-            int enchantLevels = enchContainer.costs[slot];
+            ItemStack enchantingStack = enchMenu.getSlot(0).getItem();
+            int enchantLevels = enchMenu.costs[slot];
             return getEnchantmentList(enchantmentRegistry, rand, xpSeed, enchantingStack, slot, enchantLevels, MultiVersionCompat.INSTANCE.getProtocolVersion());
         }
     }
