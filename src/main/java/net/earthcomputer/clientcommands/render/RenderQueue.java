@@ -2,11 +2,9 @@ package net.earthcomputer.clientcommands.render;
 
 import com.mojang.blaze3d.pipeline.RenderPipeline;
 import com.mojang.blaze3d.platform.DepthTestFunction;
-import com.mojang.blaze3d.vertex.DefaultVertexFormat;
-import com.mojang.blaze3d.vertex.PoseStack;
 import com.mojang.blaze3d.vertex.VertexConsumer;
-import com.mojang.blaze3d.vertex.VertexFormat;
 import net.fabricmc.fabric.api.client.event.lifecycle.v1.ClientTickEvents;
+import net.fabricmc.fabric.api.client.rendering.v1.WorldRenderContext;
 import net.fabricmc.fabric.api.client.rendering.v1.WorldRenderEvents;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.renderer.RenderPipelines;
@@ -44,13 +42,7 @@ public class RenderQueue {
     static {
         ClientTickEvents.START_CLIENT_TICK.register(RenderQueue::tick);
         WorldRenderEvents.AFTER_ENTITIES.register(context -> {
-            context.matrixStack().pushPose();
-
-            Vec3 cameraPos = context.camera().getPosition();
-            context.matrixStack().translate(-cameraPos.x, -cameraPos.y, -cameraPos.z);
-            RenderQueue.render(RenderQueue.Layer.ON_TOP, Objects.requireNonNull(context.consumers()).getBuffer(RenderQueue.LINES_NO_DEPTH_LAYER), context.matrixStack(), context.tickCounter().getRealtimeDeltaTicks());
-
-            context.matrixStack().popPose();
+            RenderQueue.render(RenderQueue.Layer.ON_TOP, Objects.requireNonNull(context.consumers()).getBuffer(RenderQueue.LINES_NO_DEPTH_LAYER), context);
         });
     }
 
@@ -117,11 +109,11 @@ public class RenderQueue {
         }
     }
 
-    public static void render(Layer layer, VertexConsumer vertexConsumer, PoseStack poseStack, float delta) {
+    public static void render(Layer layer, VertexConsumer vertexConsumer, WorldRenderContext context) {
         if (!queue.containsKey(layer)) {
             return;
         }
-        queue.get(layer).values().forEach(shape -> shape.render(poseStack, vertexConsumer, delta));
+        queue.get(layer).values().forEach(shape -> shape.render(vertexConsumer, context));
     }
 
     public enum Layer {
