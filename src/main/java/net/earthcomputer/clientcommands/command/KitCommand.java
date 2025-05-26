@@ -137,7 +137,7 @@ public class KitCommand {
             if (slots.get(i).container == source.getPlayer().getInventory()) {
                 ItemStack itemStack = tempInv.getItem(slots.get(i).getContainerSlot());
                 if (!itemStack.isEmpty() || override) {
-                    source.getPlayer().getInventory().setItem(i, itemStack);
+                    source.getPlayer().getInventory().setItem(slots.get(i).getContainerSlot(), itemStack);
                     source.getClient().gameMode.handleCreativeModeItemAdd(itemStack, i);
                 }
             }
