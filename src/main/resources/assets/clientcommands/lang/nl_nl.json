@@ -112,9 +112,7 @@
   "enchCrack.xpSeed.many": "Mogelijke XP seeds: %s",
   "enchCrack.xpSeed.one": "XP Seed: %s",
 
-  "itemCrack.notEnoughItems": "RNG SeedCracker kan niet worden gebruikt: niet genoeg items in spelershand",
-
-  "playerManip.notEnoughItems": "Niet genoeg items(%s van %s) om seed te manipuleren",
+  "playerManip.notEnoughItems": "Niet genoeg items om seed te manipuleren",
   "playerManip.reset": "Speler RNG manipulatie aan het herstarten. Reden: %s",
   "playerManip.reset.advancement": "Prestatie Behaald",
   "playerManip.reset.anvil": "Aambeeld Gebruikt",

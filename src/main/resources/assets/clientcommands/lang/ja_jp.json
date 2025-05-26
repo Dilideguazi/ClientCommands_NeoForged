@@ -266,9 +266,7 @@
   "enchCrack.xpSeed.many": "可能性のあるXPシード: %s",
   "enchCrack.xpSeed.one": "XPシード: %s",
 
-  "itemCrack.notEnoughItems": "RNGシードクラッカの使用に失敗しました: 十分なアイテムがありません",
-
-  "playerManip.notEnoughItems": "シードを操作するためのアイテムが不足しています (%s 分の %s)",
+  "playerManip.notEnoughItems": "シードを操作するためのアイテムが不足しています",
   "playerManip.reset": "RNG操作を再度開始しています、 理由は次のとおりです: %s",
   "playerManip.reset.advancement": "進捗の達成",
   "playerManip.reset.amethystChime": "アメジストのクリスタルのを上を歩きました",

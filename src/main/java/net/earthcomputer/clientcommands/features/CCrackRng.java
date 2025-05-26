@@ -48,9 +48,8 @@ public class CCrackRng {
             }
 
             @Override
-            protected void onFailedToThrowItem() {
-                Minecraft.getInstance().gui.getChat().addMessage(Component.translatable("itemCrack.notEnoughItems").withStyle(ChatFormatting.RED));
-                EnchantmentCracker.LOGGER.info("Unable to use rng SeedCracker |not enough items|");
+            protected void onFailedToThrowItem(PlayerRandCracker.ThrowItemsResult throwItemsResult) {
+                super.onFailedToThrowItem(throwItemsResult);
                 Configs.playerCrackState = PlayerRandCracker.CrackState.UNCRACKED;
                 currentTaskName = null;
             }

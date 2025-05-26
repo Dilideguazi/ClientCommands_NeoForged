@@ -287,13 +287,11 @@
   "enchCrack.xpSeed.many": "可能的经验值种子数量：%s",
   "enchCrack.xpSeed.one": "经验值种子：%s",
 
-  "itemCrack.notEnoughItems": "无法使用随机数种子破解：玩家手中物品不足",
-
   "minesweeperGame.minesLeft": "剩余地雷：%s",
   "minesweeperGame.timePlayed": "游玩时间：%s秒",
   "minesweeperGame.title": "扫雷",
 
-  "playerManip.notEnoughItems": "物品数量（%s，共%s）不足以破解玩家种子",
+  "playerManip.notEnoughItems": "物品数量不足以破解玩家种子",
   "playerManip.reset": "重新开始操控玩家随机数。原因：%s",
   "playerManip.reset.advancement": "获得了进度",
   "playerManip.reset.amethystChime": "在紫水晶上走动",

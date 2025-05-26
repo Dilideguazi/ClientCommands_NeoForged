@@ -12,6 +12,7 @@ import net.minecraft.world.entity.EntityType;
 import org.slf4j.Logger;
 
 import java.lang.ref.WeakReference;
+import java.util.EnumSet;
 import java.util.Set;
 
 public class ItemThrowTask extends SimpleTask {
@@ -36,6 +37,7 @@ public class ItemThrowTask extends SimpleTask {
     private float itemThrowsAllowedThisTick;
     private boolean waitingFence = false;
     private boolean failed = false;
+    private final Set<PlayerRandCracker.ThrowItemsResult.Type> errorTypesHappened = EnumSet.noneOf(PlayerRandCracker.ThrowItemsResult.Type.class);
 
     public ItemThrowTask(int itemsToThrow) {
         this(itemsToThrow, 0);
@@ -57,13 +59,14 @@ public class ItemThrowTask extends SimpleTask {
 
         while (((flags & FLAG_URGENT) != 0 || itemThrowsAllowedThisTick >= 1) && sentItemThrows < totalItemsToThrow) {
             itemThrowsAllowedThisTick--;
-            if (!PlayerRandCracker.throwItem()) {
+            PlayerRandCracker.ThrowItemsResult throwItemsResult = PlayerRandCracker.throwItem();
+            if (!throwItemsResult.isSuccess()) {
+                onFailedToThrowItem(throwItemsResult);
                 if ((flags & FLAG_WAIT_FOR_ITEMS) != 0) {
                     return;
                 }
                 failed = true;
                 _break();
-                onFailedToThrowItem();
                 return;
             }
             onItemThrown(++sentItemThrows, totalItemsToThrow);
@@ -102,7 +105,12 @@ public class ItemThrowTask extends SimpleTask {
         return MUTEX_KEYS;
     }
 
-    protected void onFailedToThrowItem() {
+    protected void onFailedToThrowItem(PlayerRandCracker.ThrowItemsResult throwItemsResult) {
+        if (throwItemsResult.getType() != PlayerRandCracker.ThrowItemsResult.Type.NOT_ENOUGH_ITEMS || (flags & FLAG_WAIT_FOR_ITEMS) == 0) {
+            if (errorTypesHappened.add(throwItemsResult.getType())) {
+                throwItemsResult.sendErrorMessage();
+            }
+        }
     }
 
     protected void onSuccess() {

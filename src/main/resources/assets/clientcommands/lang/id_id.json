@@ -266,9 +266,7 @@
   "enchCrack.xpSeed.many": "Kemungkinan benih XP: %s",
   "enchCrack.xpSeed.one": "Benih XP: %s",
 
-  "itemCrack.notEnoughItems": "Tidak bisa menggunakkan SeedCracker RNG: Tidak cukup benda di Tangan Pemain",
-
-  "playerManip.notEnoughItems": "Tidak cukup item(%s dari %s) untuk memanipulasi seed",
+  "playerManip.notEnoughItems": "Tidak cukup item untuk memanipulasi seed",
   "playerManip.reset": "Manipulasi pemain RNG telah di reset. Alasan: %s",
   "playerManip.reset.advancement": "Mendapatkan Advancement",
   "playerManip.reset.amethystChime": "Jalan di Gugus Kecubung",

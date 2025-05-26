@@ -9,6 +9,9 @@ import net.earthcomputer.clientcommands.event.ClientLevelEvents;
 import net.earthcomputer.clientcommands.interfaces.ICreativeSlot;
 import net.minecraft.ChatFormatting;
 import net.minecraft.client.Minecraft;
+import net.minecraft.client.gui.screens.inventory.AbstractContainerScreen;
+import net.minecraft.client.gui.screens.inventory.CreativeModeInventoryScreen;
+import net.minecraft.client.multiplayer.MultiPlayerGameMode;
 import net.minecraft.client.player.LocalPlayer;
 import net.minecraft.core.component.DataComponents;
 import net.minecraft.network.chat.Component;
@@ -38,6 +41,7 @@ import java.util.Map;
 import java.util.OptionalLong;
 import java.util.Random;
 import java.util.concurrent.atomic.AtomicLong;
+import java.util.function.Function;
 import java.util.function.Predicate;
 import java.util.stream.Collectors;
 
@@ -326,20 +330,24 @@ public class PlayerRandCracker {
                     }
 
                     if (Configs.infiniteTools && Configs.playerCrackState.knowsSeed()) {
-                        int unbreakingLevel_f = unbreakingLevel;
-                        Runnable action = () -> throwItemsUntil(rand -> {
-                            for (int i = 0; i < amount; i++) {
-                                Equippable equippableComponent = stack.get(DataComponents.EQUIPPABLE);
-                                boolean isArmor = equippableComponent != null && equippableComponent.damageOnHurt();
-                                if (isArmor && rand.nextFloat() < 0.6) {
-                                    return false;
+                        Runnable action = () -> {
+                            ThrowItemsResult result = throwItemsUntil(rand -> {
+                                for (int i = 0; i < amount; i++) {
+                                    Equippable equippableComponent = stack.get(DataComponents.EQUIPPABLE);
+                                    boolean isArmor = equippableComponent != null && equippableComponent.damageOnHurt();
+                                    if (isArmor && rand.nextFloat() < 0.6) {
+                                        return false;
+                                    }
+                                    if (rand.nextInt(unbreakingLevel + 1) == 0) {
+                                        return false;
+                                    }
                                 }
-                                if (rand.nextInt(unbreakingLevel_f + 1) == 0) {
-                                    return false;
-                                }
+                                return true;
+                            }, 64);
+                            if (!result.isSuccess()) {
+                                result.sendErrorMessage();
                             }
-                            return true;
-                        }, 64);
+                        };
                         if (isPredictingBlockBreaking) {
                             postBlockBreakPredictAction = action;
                         } else {
@@ -403,26 +411,45 @@ public class PlayerRandCracker {
             return new ThrowItemsResult(ThrowItemsResult.Type.NOT_POSSIBLE, itemsNeeded);
         }
         for (int i = 0; i < itemsNeeded; i++) {
-            if (!throwItem()) {
-                return new ThrowItemsResult(ThrowItemsResult.Type.NOT_ENOUGH_ITEMS, i, itemsNeeded);
+            ThrowItemsResult result = throwItem();
+            if (!result.isSuccess()) {
+                return result;
             }
         }
 
         return new ThrowItemsResult(ThrowItemsResult.Type.SUCCESS);
     }
 
-    public static boolean throwItem() {
-        LocalPlayer player = Minecraft.getInstance().player;
+    public static ThrowItemsResult throwItem() {
+        Minecraft mc = Minecraft.getInstance();
+        LocalPlayer player = mc.player;
+        MultiPlayerGameMode interactionManager = mc.gameMode;
+        assert player != null && interactionManager != null;
+
+        boolean isInContainer = mc.screen instanceof AbstractContainerScreen && !(mc.screen instanceof CreativeModeInventoryScreen);
+        boolean useCreativeThrow = player.hasInfiniteMaterials() && !isInContainer;
+        if (useCreativeThrow) {
+            // the client throttle is set a bit below the server throttle so we shouldn't get a desync here
+            if (!player.canDropItems()) {
+                return new ThrowItemsResult(ThrowItemsResult.Type.THROTTLED);
+            }
+
+            expectedThrows++;
+            ItemStack stackToDrop = new ItemStack(Items.COBBLESTONE);
+            player.drop(stackToDrop, true);
+            interactionManager.handleCreativeModeItemDrop(stackToDrop);
+            return new ThrowItemsResult(ThrowItemsResult.Type.SUCCESS);
+        }
 
         Slot matchingSlot = getBestItemThrowSlot(player.containerMenu.slots);
         if (matchingSlot == null) {
-            return false;
+            return new ThrowItemsResult(ThrowItemsResult.Type.NOT_ENOUGH_ITEMS);
         }
         expectedThrows++;
-        Minecraft.getInstance().gameMode.handleInventoryMouseClick(player.containerMenu.containerId,
+        interactionManager.handleInventoryMouseClick(player.containerMenu.containerId,
                 matchingSlot.index, 0, ClickType.THROW, player);
 
-        return true;
+        return new ThrowItemsResult(ThrowItemsResult.Type.SUCCESS);
     }
 
     public static void unthrowItem() {
@@ -453,7 +480,6 @@ public class PlayerRandCracker {
         if (itemCounts.isEmpty()) {
             return null;
         }
-        //noinspection OptionalGetWithoutIsPresent
         Item preferredItem = itemCounts.keySet().stream().max(Comparator.comparingInt(Item::getDefaultMaxStackSize).thenComparing(itemCounts::get)).get();
         //noinspection OptionalGetWithoutIsPresent
         return slots.stream().filter(slot -> slot.getItem().getItem() == preferredItem).findFirst().get();
@@ -488,47 +514,59 @@ public class PlayerRandCracker {
 
     public static class ThrowItemsResult {
         private final Type type;
-        private final MutableComponent message;
+        private final Object[] messageArgs;
 
-        public ThrowItemsResult(Type type, Object... args) {
+        public ThrowItemsResult(Type type, Object... messageArgs) {
             this.type = type;
-            this.message = Component.translatable(type.getTranslationKey(), args);
+            this.messageArgs = messageArgs;
+        }
+
+        public boolean isSuccess() {
+            return type.success;
         }
 
         public Type getType() {
             return type;
         }
 
-        public MutableComponent getMessage() {
-            return message;
+        public void sendErrorMessage() {
+            for (MutableComponent message : type.messageCreator.apply(messageArgs)) {
+                ClientCommandHelper.sendFeedback(message);
+            }
         }
 
         public enum Type {
-            NOT_ENOUGH_ITEMS(false, "playerManip.notEnoughItems"),
+            NOT_ENOUGH_ITEMS(false, args -> List.of(
+                Component.translatable("playerManip.notEnoughItems", args).withStyle(ChatFormatting.RED),
+                Component.translatable("playerManip.notEnoughItems.help").withStyle(ChatFormatting.AQUA)
+            )),
             NOT_POSSIBLE(false, "playerManip.throwError"),
-            UNKNOWN_SEED(false, "playerManip.uncracked"),
-            SUCCESS(true, null),
+            THROTTLED(false, args -> List.of(
+                Component.translatable("playerManip.throttled", args).withStyle(ChatFormatting.RED),
+                Component.translatable("playerManip.throttled.help").withStyle(ChatFormatting.AQUA)
+            )),
+            UNKNOWN_SEED(false, args -> List.of(Component.translatable("playerManip.uncracked")
+                .append(" ")
+                .append(ClientCommandHelper.getCommandTextComponent("commands.client.crack", "/ccrackrng"))
+                .withStyle(ChatFormatting.RED))),
+            SUCCESS(true, (Function<Object[], List<MutableComponent>>) null),
             ;
 
             private final boolean success;
-            private final String translationKey;
+            private final Function<Object[], List<MutableComponent>> messageCreator;
 
-            Type(boolean success, String translationKey) {
+            Type(boolean success, @Translatable String translationKey) {
+                this(success, args -> List.of(Component.translatable(translationKey, args).withStyle(ChatFormatting.RED)));
+            }
+
+            Type(boolean success, Function<Object[], List<MutableComponent>> messageCreator) {
                 this.success = success;
-                this.translationKey = translationKey;
-            }
-
-            public boolean isSuccess() {
-                return success;
-            }
-
-            public String getTranslationKey() {
-                return translationKey;
+                this.messageCreator = messageCreator;
             }
         }
     }
 
-    public static enum CrackState implements StringRepresentable {
+    public enum CrackState implements StringRepresentable {
         UNCRACKED("uncracked"),
         CRACKED("cracked", true),
         ENCH_CRACKING_1("ench_cracking_1"),

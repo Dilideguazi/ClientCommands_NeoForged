@@ -282,9 +282,7 @@
   "enchCrack.xpSeed.many": "Anzahl der möglichen XP-Seeds: %s",
   "enchCrack.xpSeed.one": "XP-Seed: %s",
 
-  "itemCrack.notEnoughItems": "Kann RNG-SeedCracker nicht benutzen: Nicht genug Gegenstände in der Hand des Spielers",
-
-  "playerManip.notEnoughItems": "Nicht genug Gegenstände (%s von %s), um Seed zu manipulieren",
+  "playerManip.notEnoughItems": "Nicht genug Gegenstände, um Seed zu manipulieren",
   "playerManip.reset": "Starte Spieler-RNG-Manipulation neu. Grund: %s",
   "playerManip.reset.advancement": "Fortschritt erzielt",
   "playerManip.reset.amethystChime": "Auf einen Amethystkristall gestiegen",

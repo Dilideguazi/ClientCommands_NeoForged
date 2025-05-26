@@ -200,9 +200,7 @@
   "enchCrack.xpSeed.many": "Возможный Сид Опыта: %s",
   "enchCrack.xpSeed.one": "Сид Опыта: %s",
 
-  "itemCrack.notEnoughItems": "Невозможно использовать ВзломщикСида Рандомного Генератора Чисел: Недостаточно предметов в инвенторе игрока",
-
-  "playerManip.notEnoughItems": "Недостаточно элементов (%s из %s) для манипуляций с seed",
+  "playerManip.notEnoughItems": "Недостаточно элементов для манипуляций с seed",
   "playerManip.reset": "Перезапуск манипуляции Рандомного Генератора Чисел игрока. Причина: %s",
   "playerManip.reset.advancement": "Полученно достижение",
   "playerManip.reset.amethystChime": "Ходьба по аметистам",

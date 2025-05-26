@@ -194,9 +194,7 @@
   "enchCrack.xpSeed.many": "Liczba możliwych ziarn XP: %s",
   "enchCrack.xpSeed.one": "Ziarno XP: %s",
 
-  "itemCrack.notEnoughItems": "Nie można użyć RNG SeedCracker: niewystarczająca ilość przedmiotów w ekwipunku",
-
-  "playerManip.notEnoughItems": "Nie wystarczająca ilość przedmiotów (%s of %s) by manipulować ziarnem",
+  "playerManip.notEnoughItems": "Nie wystarczająca ilość przedmiotów by manipulować ziarnem",
   "playerManip.reset": "Resetowanie manipulacji RNG. Powód: %s",
   "playerManip.reset.advancement": "Zdobyto osiągnięcie",
   "playerManip.reset.anvil": "Użyto kowadła",
