@@ -329,6 +329,9 @@
 
   "enchCrack.addInfo": "Add Info",
   "enchCrack.bookshelfCount": "Bookshelf Count: %s",
+  "enchCrack.bookshelfCount.actual": "Actual Bookshelf Count: %s",
+  "enchCrack.bookshelfCount.expected": "Expected Bookshelf Count: %s",
+  "enchCrack.bookshelfCount.incorrect": "Incorrect Bookshelf Count",
   "enchCrack.clues": "Clues:",
   "enchCrack.enchantments": "Enchantments:",
   "enchCrack.insn.bookshelves": "Bookshelves needed: %s",

@@ -9,6 +9,7 @@ import it.unimi.dsi.fastutil.objects.Object2IntMap;
 import it.unimi.dsi.fastutil.objects.Object2IntOpenHashMap;
 import net.earthcomputer.clientcommands.Configs;
 import net.earthcomputer.clientcommands.command.ClientCommandHelper;
+import net.earthcomputer.clientcommands.event.ClientLevelEvents;
 import net.earthcomputer.clientcommands.util.MultiVersionCompat;
 import net.earthcomputer.clientcommands.task.ItemThrowTask;
 import net.earthcomputer.clientcommands.task.LongTask;
@@ -23,7 +24,6 @@ import net.minecraft.client.gui.GuiGraphics;
 import net.minecraft.client.gui.components.ChatComponent;
 import net.minecraft.client.multiplayer.ClientLevel;
 import net.minecraft.client.player.LocalPlayer;
-import net.minecraft.client.resources.language.I18n;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Holder;
 import net.minecraft.core.IdMap;
@@ -118,8 +118,14 @@ public class EnchantmentCracker {
 
     private static WeakReference<LongTask> currentEnchantingTask = null;
     private static boolean isCurrentlyThrowingItems = false;
+    private static int expectedNumBookshelves = -1;
 
     public static void registerEvents() {
+        ClientLevelEvents.UNLOAD_LEVEL.register(isDisconnect -> {
+            if (isDisconnect) {
+                expectedNumBookshelves = -1;
+            }
+        });
         PlayerRandCracker.RNG_CALLED_EVENT.register(EnchantmentCracker::onRNGCallEvent);
     }
 
@@ -134,46 +140,60 @@ public class EnchantmentCracker {
 
         CrackState crackState = Configs.enchCrackState;
 
-        List<String> lines = new ArrayList<>();
+        List<Component> lines = new ArrayList<>();
 
-        lines.add(I18n.get("enchCrack.state", I18n.get("enchCrack.state." + crackState.getSerializedName())));
-        lines.add(I18n.get("playerManip.state", I18n.get("playerManip.state." + Configs.playerCrackState.getSerializedName())));
+        lines.add(Component.translatable("enchCrack.state", Component.translatable("enchCrack.state." + crackState.getSerializedName())));
+        lines.add(Component.translatable("playerManip.state", Component.translatable("playerManip.state." + Configs.playerCrackState.getSerializedName())));
 
-        lines.add("");
+        lines.add(Component.empty());
 
         if (crackState == CrackState.CRACKED) {
-            lines.add(I18n.get("enchCrack.xpSeed.one", String.format("%08X", possibleXPSeeds.iterator().next())));
+            lines.add(Component.translatable("enchCrack.xpSeed.one", String.format("%08X", possibleXPSeeds.iterator().next())));
         } else if (crackState == CrackState.CRACKING) {
-            lines.add(I18n.get("enchCrack.xpSeed.many", possibleXPSeeds.size()));
+            lines.add(Component.translatable("enchCrack.xpSeed.many", possibleXPSeeds.size()));
         }
 
-        lines.add("");
+        lines.add(Component.empty());
 
         if (enchantingTablePos != null) {
-            lines.add(I18n.get("enchCrack.bookshelfCount", getEnchantPower(level, enchantingTablePos)));
-            lines.add("");
+            int numBookshelves = getEnchantPower(level, enchantingTablePos);
+            if (expectedNumBookshelves == -1) {
+                lines.add(Component.translatable("enchCrack.bookshelfCount", numBookshelves));
+            } else {
+                boolean bookshelfCountMatches = numBookshelves == expectedNumBookshelves || (numBookshelves > 15 && expectedNumBookshelves == 15);
+                lines.add(Component.translatable("enchCrack.bookshelfCount.expected", expectedNumBookshelves));
+                lines.add(Component.translatable(
+                    "enchCrack.bookshelfCount.actual",
+                    Component.literal(String.valueOf(numBookshelves))
+                        .withStyle(bookshelfCountMatches ? ChatFormatting.GREEN : ChatFormatting.RED)
+                ));
+                if (!bookshelfCountMatches) {
+                    lines.add(Component.translatable("enchCrack.bookshelfCount.incorrect").withStyle(ChatFormatting.RED));
+                }
+            }
+            lines.add(Component.empty());
         }
 
         if (crackState == CrackState.CRACKED) {
-            lines.add(I18n.get("enchCrack.enchantments"));
+            lines.add(Component.translatable("enchCrack.enchantments"));
         } else {
-            lines.add(I18n.get("enchCrack.clues"));
+            lines.add(Component.translatable("enchCrack.clues"));
         }
 
         for (int slot = 0; slot < 3; slot++) {
-            lines.add(I18n.get("enchCrack.slot", slot + 1));
+            lines.add(Component.translatable("enchCrack.slot", slot + 1));
             List<EnchantmentInstance> enchs = getEnchantmentsInTable(slot);
             if (enchs != null) {
                 sortIntoTooltipOrder(level.registryAccess().lookupOrThrow(Registries.ENCHANTMENT), enchs);
                 for (EnchantmentInstance ench : enchs) {
-                    lines.add("   " + Enchantment.getFullname(ench.enchantment(), ench.level()).getString());
+                    lines.add(Component.literal("   ").append(Enchantment.getFullname(ench.enchantment(), ench.level())));
                 }
             }
         }
 
         Font font = Minecraft.getInstance().font;
         int y = 0;
-        for (String line : lines) {
+        for (Component line : lines) {
             graphics.drawString(font, line, 0, y, 0xffffff, false);
             y += font.lineHeight;
         }
@@ -357,6 +377,7 @@ public class EnchantmentCracker {
             event.setMaintainedEvenIfSeedUnknown();
         }
         doneEnchantment = true;
+        expectedNumBookshelves = -1;
     }
 
     // ENCHANTMENT MANIPULATION
@@ -569,6 +590,7 @@ public class EnchantmentCracker {
                                 chat.addMessage(Component.translatable("enchCrack.insn.ready").withStyle(ChatFormatting.BOLD));
                                 chat.addMessage(Component.translatable("enchCrack.insn.bookshelves", finalResult.bookshelves));
                                 chat.addMessage(Component.translatable("enchCrack.insn.slot", finalResult.slot + 1));
+                                expectedNumBookshelves = finalResult.bookshelves;
                             }
                         }
 
