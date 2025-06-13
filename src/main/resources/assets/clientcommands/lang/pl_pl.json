@@ -225,9 +225,7 @@
   "playerManip.state.ench_cracking_1": "Łamanie ziarna zaklęcia 1",
   "playerManip.state.ench_cracking_2": "Łamanie ziarna zaklęcia 2",
   "playerManip.state.half_cracked": "Złamano w połowie",
-  "playerManip.state.manipulating_enchantments": "Manipulowanie zaklęć",
   "playerManip.state.uncracked": "Nie złamano",
-  "playerManip.state.waiting_dummy_enchant": "Czekam na zbędny przedmiot",
   "playerManip.throwError": "Czynność jest niemożliwa lub wymagała by więcej niż %s rzutów przedmiotami",
   "playerManip.toolBreakWarning": "Ostrzeżenie: Narzędzie ma %s wytrzymałości",
   "playerManip.uncracked": "Ziarno gracza musi być złamane"

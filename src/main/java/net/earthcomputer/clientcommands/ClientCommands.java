@@ -10,6 +10,7 @@ import dev.xpple.betterconfig.api.ModConfigBuilder;
 import net.earthcomputer.clientcommands.command.*;
 import net.earthcomputer.clientcommands.event.ClientConnectionEvents;
 import net.earthcomputer.clientcommands.features.CommandExecutionCustomPayload;
+import net.earthcomputer.clientcommands.features.EnchantmentCracker;
 import net.earthcomputer.clientcommands.features.FishingCracker;
 import net.earthcomputer.clientcommands.features.PlayerRandCracker;
 import net.earthcomputer.clientcommands.features.Relogger;
@@ -77,6 +78,7 @@ public class ClientCommands implements ClientModInitializer {
 
         // Events
         ClientCommandRegistrationCallback.EVENT.register(ClientCommands::registerCommands);
+        EnchantmentCracker.registerEvents();
         FishingCracker.registerEvents();
         PlayerRandCracker.registerEvents();
         ServerBrandManager.registerEvents();

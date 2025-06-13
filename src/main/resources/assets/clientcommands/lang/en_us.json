@@ -68,6 +68,7 @@
 
   "commands.ccrackrng.failed": "Failed to crack player seed",
   "commands.ccrackrng.failed.help": "Help: RNG manipulation doesn't work on some modded servers, in particular Paper",
+  "commands.ccrackrng.failed.unexpectedCall": "Failed to crack player seed due to unexpected RNG call: %s",
   "commands.ccrackrng.retries": "Cracking player seed, attempt %s/%s",
   "commands.ccrackrng.starting": "Cracking player seed",
   "commands.ccrackrng.success": "Player RNG cracked: %s",
@@ -91,6 +92,7 @@
   "commands.cenchant.needEnchantingPrediction": "This command requires enchanting prediction to be enabled",
   "commands.cenchant.success": "Starting enchantment manipulation...",
   "commands.cenchant.uncracked": "Seed needs to be cracked",
+  "commands.cenchant.unexpectedCall": "Stopped enchantment manipulation due to unexpected RNG call: %s",
 
   "commands.cfind.found": "Found %s at %s, %s blocks away",
   "commands.cfind.keepSearching.success": "Finding entities",
@@ -388,9 +390,7 @@
   "playerManip.state.ench_cracking_1": "Cracking Enchantment Seed 1",
   "playerManip.state.ench_cracking_2": "Cracking Enchantment Seed 2",
   "playerManip.state.half_cracked": "Half Cracked",
-  "playerManip.state.manipulating_enchantments": "Manipulating Enchantments",
   "playerManip.state.uncracked": "Uncracked",
-  "playerManip.state.waiting_dummy_enchant": "Waiting for Dummy Enchantment",
   "playerManip.throttled": "Hit the creative mode item throw throttle limit",
   "playerManip.throttled.help": "Help: try changing to survival mode",
   "playerManip.throwError": "Condition not possible or would require more than %s item throws",
