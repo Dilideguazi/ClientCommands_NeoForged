@@ -194,7 +194,7 @@ public class EnchantmentCracker {
         Font font = Minecraft.getInstance().font;
         int y = 0;
         for (Component line : lines) {
-            graphics.drawString(font, line, 0, y, 0xffffff, false);
+            graphics.drawString(font, line, 0, y, 0xffffffff, false);
             y += font.lineHeight;
         }
     }

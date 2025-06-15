@@ -12,10 +12,9 @@ import com.mojang.serialization.Dynamic;
 import net.earthcomputer.clientcommands.ClientCommands;
 import net.earthcomputer.clientcommands.render.RenderQueue;
 import net.fabricmc.fabric.api.client.command.v2.FabricClientCommandSource;
-import net.fabricmc.fabric.api.client.rendering.v1.HudLayerRegistrationCallback;
-import net.fabricmc.fabric.api.client.rendering.v1.IdentifiedLayer;
 import net.fabricmc.fabric.api.client.rendering.v1.WorldRenderContext;
 import net.fabricmc.fabric.api.client.rendering.v1.WorldRenderEvents;
+import net.fabricmc.fabric.api.client.rendering.v1.hud.HudElementRegistry;
 import net.minecraft.ChatFormatting;
 import net.minecraft.SharedConstants;
 import net.minecraft.Util;
@@ -225,7 +224,7 @@ public class WaypointCommand {
     private static void saveFile() throws CommandSyntaxException {
         try {
             CompoundTag rootTag = new CompoundTag();
-            rootTag.putInt("DataVersion", SharedConstants.getCurrentVersion().getDataVersion().getVersion());
+            rootTag.putInt("DataVersion", SharedConstants.getCurrentVersion().dataVersion().version());
             CompoundTag compoundTag = new CompoundTag();
             waypoints.forEach((worldIdentifier, worldWaypoints) -> compoundTag.put(worldIdentifier, worldWaypoints.entrySet().stream()
                 .collect(CompoundTag::new, (result, entry) -> {
@@ -283,7 +282,7 @@ public class WaypointCommand {
     }
 
     public static void registerEvents() {
-        HudLayerRegistrationCallback.EVENT.register(drawerWrapper -> drawerWrapper.addLayer(IdentifiedLayer.of(HUD_LAYER_ID, WaypointCommand::renderWaypointLabels)));
+        HudElementRegistry.addLast(HUD_LAYER_ID, WaypointCommand::renderWaypointLabels);
         WorldRenderEvents.AFTER_ENTITIES.register(WaypointCommand::renderWaypointBoxes);
     }
 
@@ -373,7 +372,7 @@ public class WaypointCommand {
         for (int line = 0; line < positions.size(); line++) {
             List<WaypointLabelLocation> w = positions.get(line);
             for (WaypointLabelLocation waypoint : w) {
-                guiGraphics.drawCenteredString(minecraft.font, waypoint.label(), waypoint.location(), 1 + line * minecraft.font.lineHeight, 0xFFFFFF);
+                guiGraphics.drawCenteredString(minecraft.font, waypoint.label(), waypoint.location(), 1 + line * minecraft.font.lineHeight, 0xFFFFFFFF);
             }
         }
     }
