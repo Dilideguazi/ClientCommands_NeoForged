@@ -76,6 +76,7 @@
     "commands.snap.MinecraftMixin",
     "dataqueryhandler.ClientPacketListenerMixin",
     "events.ClientPacketListenerMixin",
+    "events.LevelRendererMixin",
     "lengthextender.ChatScreenMixin",
     "rngevents.ClientLevelMixin",
     "scrambletitle.MinecraftMixin",

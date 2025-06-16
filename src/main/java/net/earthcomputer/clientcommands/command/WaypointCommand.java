@@ -10,10 +10,10 @@ import com.mojang.brigadier.exceptions.SimpleCommandExceptionType;
 import com.mojang.logging.LogUtils;
 import com.mojang.serialization.Dynamic;
 import net.earthcomputer.clientcommands.ClientCommands;
+import net.earthcomputer.clientcommands.event.MoreWorldRenderEvents;
 import net.earthcomputer.clientcommands.render.RenderQueue;
 import net.fabricmc.fabric.api.client.command.v2.FabricClientCommandSource;
 import net.fabricmc.fabric.api.client.rendering.v1.WorldRenderContext;
-import net.fabricmc.fabric.api.client.rendering.v1.WorldRenderEvents;
 import net.fabricmc.fabric.api.client.rendering.v1.hud.HudElementRegistry;
 import net.minecraft.ChatFormatting;
 import net.minecraft.SharedConstants;
@@ -283,7 +283,7 @@ public class WaypointCommand {
 
     public static void registerEvents() {
         HudElementRegistry.addLast(HUD_LAYER_ID, WaypointCommand::renderWaypointLabels);
-        WorldRenderEvents.AFTER_ENTITIES.register(WaypointCommand::renderWaypointBoxes);
+        MoreWorldRenderEvents.END_MAIN_PASS.register(WaypointCommand::renderWaypointBoxes);
     }
 
     private static void renderWaypointLabels(GuiGraphics guiGraphics, DeltaTracker deltaTracker) {
@@ -413,7 +413,7 @@ public class WaypointCommand {
             Font font = Minecraft.getInstance().font;
             int width = font.width(waypointName) / 2;
             int backgroundColour = (int) (Minecraft.getInstance().options.getBackgroundOpacity(0.25f) * 255.0f) << 24;
-            font.drawInBatch(waypointName, -width, 0, 0xFFFFFF, false, stack.last().pose(), context.consumers(), Font.DisplayMode.SEE_THROUGH, backgroundColour, LightTexture.FULL_SKY);
+            font.drawInBatch(waypointName, -width, 0, 0xFFFFFFFF, false, stack.last().pose(), context.consumers(), Font.DisplayMode.SEE_THROUGH, backgroundColour, LightTexture.FULL_SKY);
 
             stack.popPose();
         });
