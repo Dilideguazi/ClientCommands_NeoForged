@@ -59,7 +59,7 @@ public class RenderQueue {
     // TODO: remove this reflection by PRing to FAPI
     private static MethodHandle findWorldRenderContextHandle() {
         return Arrays.stream(LevelRenderer.class.getDeclaredFields())
-            .filter(field -> WorldRenderContext.class.isAssignableFrom(field.getType()))
+            .filter(field -> WorldRenderContext.class.isAssignableFrom(field.getType()) && field.getName().contains("context"))
             .findFirst()
             .map(field -> {
                 field.setAccessible(true);
@@ -74,7 +74,7 @@ public class RenderQueue {
 
     public static WorldRenderContext getWorldRenderContext(LevelRenderer renderer) {
         try {
-            return (WorldRenderContext) WORLD_RENDER_CONTEXT_HANDLE.invoke(renderer);
+            return (WorldRenderContext) WORLD_RENDER_CONTEXT_HANDLE.invokeExact(renderer);
         } catch (Throwable e) {
             throw new IllegalStateException("Exception calling WorldRenderContext getter", e);
         }
