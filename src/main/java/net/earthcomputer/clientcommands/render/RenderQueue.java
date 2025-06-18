@@ -74,7 +74,7 @@ public class RenderQueue {
 
     public static WorldRenderContext getWorldRenderContext(LevelRenderer renderer) {
         try {
-            return (WorldRenderContext) WORLD_RENDER_CONTEXT_HANDLE.invokeExact(renderer);
+            return (WorldRenderContext) WORLD_RENDER_CONTEXT_HANDLE.invoke(renderer);
         } catch (Throwable e) {
             throw new IllegalStateException("Exception calling WorldRenderContext getter", e);
         }
