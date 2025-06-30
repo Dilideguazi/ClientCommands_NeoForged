@@ -3,7 +3,7 @@ import net.earthcomputer.clientcommands.buildscript.GenerateBuildInfoTask
 import net.fabricmc.loom.task.prod.ClientProductionRunTask
 
 plugins {
-	id 'fabric-loom' version '1.10-SNAPSHOT'
+	id 'fabric-loom' version "${loom_version}"
 	id 'maven-publish'
 	id 'com.modrinth.minotaur' version '2.+'
 	id 'com.github.breadmoirai.github-release' version '2.4.1'
