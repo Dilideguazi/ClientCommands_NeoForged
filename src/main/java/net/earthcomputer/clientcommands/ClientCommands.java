@@ -7,6 +7,7 @@ import com.mojang.brigadier.tree.LiteralCommandNode;
 import com.mojang.logging.LogUtils;
 import dev.xpple.betterconfig.api.BetterConfigAPI;
 import dev.xpple.betterconfig.api.ModConfigBuilder;
+import dev.xpple.simplewaypoints.api.SimpleWaypointsAPI;
 import net.earthcomputer.clientcommands.command.*;
 import net.earthcomputer.clientcommands.event.ClientConnectionEvents;
 import net.earthcomputer.clientcommands.features.CommandExecutionCustomPayload;
@@ -15,6 +16,7 @@ import net.earthcomputer.clientcommands.features.FishingCracker;
 import net.earthcomputer.clientcommands.features.PlayerRandCracker;
 import net.earthcomputer.clientcommands.features.Relogger;
 import net.earthcomputer.clientcommands.features.ServerBrandManager;
+import net.earthcomputer.clientcommands.features.Waypoints;
 import net.earthcomputer.clientcommands.render.RenderQueue;
 import net.earthcomputer.clientcommands.util.MappingsHelper;
 import net.fabricmc.api.ClientModInitializer;
@@ -70,6 +72,9 @@ public class ClientCommands implements ClientModInitializer {
             }
         });
 
+        Waypoints.migrateWaypoints();
+        SimpleWaypointsAPI.getInstance().registerCommandAlias("cwaypoint");
+
         MappingsHelper.load();
 
         // Registration
@@ -82,7 +87,6 @@ public class ClientCommands implements ClientModInitializer {
         FishingCracker.registerEvents();
         PlayerRandCracker.registerEvents();
         ServerBrandManager.registerEvents();
-        WaypointCommand.registerEvents();
     }
 
     private static void setupScrambleWindowTitle() {
@@ -186,7 +190,6 @@ public class ClientCommands implements ClientModInitializer {
         UsageTreeCommand.register(dispatcher);
         UuidCommand.register(dispatcher);
         VarCommand.register(dispatcher);
-        WaypointCommand.register(dispatcher);
         WeatherCommand.register(dispatcher);
         WhisperEncryptedCommand.register(dispatcher);
         WikiCommand.register(dispatcher);
