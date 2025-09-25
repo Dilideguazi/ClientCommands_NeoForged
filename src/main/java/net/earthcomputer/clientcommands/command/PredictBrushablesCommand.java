@@ -10,6 +10,7 @@ import com.seedfinding.mcfeature.loot.MCLootTables;
 import com.seedfinding.mcfeature.loot.item.ItemStack;
 import net.earthcomputer.clientcommands.task.RenderDistanceScanTask;
 import net.earthcomputer.clientcommands.task.TaskManager;
+import net.earthcomputer.clientcommands.util.CComponentUtil;
 import net.earthcomputer.clientcommands.util.SeedfindingUtil;
 import net.fabricmc.fabric.api.client.command.v2.FabricClientCommandSource;
 import net.minecraft.SharedConstants;
@@ -57,7 +58,7 @@ public class PredictBrushablesCommand {
         boolean keepSearching = getFlag(ctx, FLAG_KEEP_SEARCHING);
         String taskName = TaskManager.addTask("cpredictbrushables", new PredictBrushablesTask(keepSearching));
         if (keepSearching) {
-            sendFeedback(Component.translatable("commands.cpredictbrushables.starting.keepSearching", getCommandTextComponent("commands.client.cancel", "/ctask stop " + taskName)));
+            sendFeedback(Component.translatable("commands.cpredictbrushables.starting.keepSearching", CComponentUtil.getCommandTextComponent("commands.client.cancel", "/ctask stop " + taskName)));
         } else {
             sendFeedback(Component.translatable("commands.cpredictbrushables.starting"));
         }
@@ -127,7 +128,7 @@ public class PredictBrushablesCommand {
             for (ItemStack item : items) {
                 var mcItemStack = SeedfindingUtil.fromSeedfindingItem(item, level.registryAccess());
                 mcItemStack.set(DataComponents.LORE, getItemLore(mcItemStack));
-                ClientCommandHelper.sendFeedback(Component.translatable("commands.cpredictbrushables.foundBrushableBlock", blockState.getBlock().getName(), ClientCommandHelper.getLookCoordsTextComponent(pos), mcItemStack.getDisplayName(), ClientCommandHelper.getGlowButtonTextComponent(pos)));
+                ClientCommandHelper.sendFeedback(Component.translatable("commands.cpredictbrushables.foundBrushableBlock", blockState.getBlock().getName(), CComponentUtil.getLookCoordsTextComponent(pos), mcItemStack.getDisplayName(), CComponentUtil.getGlowButtonTextComponent(pos)));
             }
 
             found = true;

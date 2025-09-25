@@ -13,6 +13,7 @@ import net.earthcomputer.clientcommands.command.ClientCommandHelper;
 import net.earthcomputer.clientcommands.command.ConnectFourCommand;
 import net.earthcomputer.clientcommands.command.TicTacToeCommand;
 import net.earthcomputer.clientcommands.event.ClientConnectionEvents;
+import net.earthcomputer.clientcommands.util.CComponentUtil;
 import net.fabricmc.fabric.api.client.command.v2.FabricClientCommandSource;
 import net.minecraft.ChatFormatting;
 import net.minecraft.client.Minecraft;
@@ -197,7 +198,7 @@ public class TwoPlayerGame<T, S extends Screen> {
                     .withUnderlined(true)
                     .withColor(ChatFormatting.GREEN)
                     .withHoverEvent(new HoverEvent.ShowText(Component.translatable("c2cpacket.startTwoPlayerGameC2CPacket.incoming.accept.hover")))
-                    .withClickEvent(ClientCommandHelper.callbackClickEvent(() -> {
+                    .withClickEvent(CComponentUtil.callbackClickEvent(() -> {
                         if (!game.openGame(opponent.getProfile().getId())) {
                             game.addNewGame(opponent, false);
 
