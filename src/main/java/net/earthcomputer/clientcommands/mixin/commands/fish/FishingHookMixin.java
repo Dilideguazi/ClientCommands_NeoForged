@@ -27,7 +27,7 @@ public abstract class FishingHookMixin extends Entity {
             slice = @Slice(from = @At(value = "FIELD", target = "Lnet/minecraft/world/entity/projectile/FishingHook;outOfWaterTime:I", ordinal = 0)),
             at = @At(value = "INVOKE", target = "Ljava/lang/Math;min(II)I", remap = false, ordinal = 0))
     private void onBobOutOfWater(CallbackInfo ci) {
-        if (FishingCracker.canManipulateFishing() && level().isClientSide && getPlayerOwner() == Minecraft.getInstance().player) {
+        if (FishingCracker.canManipulateFishing() && level().isClientSide() && getPlayerOwner() == Minecraft.getInstance().player) {
             FishingCracker.onBobOutOfWater();
         }
     }

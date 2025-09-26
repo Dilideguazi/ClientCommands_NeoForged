@@ -86,7 +86,7 @@ public class FindBlockCommand {
             if (closestBlock == null) {
                 sendError(Component.translatable("commands.cfindblock.notFound"));
             } else {
-                Entity cameraEntity = Objects.requireNonNullElse(Minecraft.getInstance().cameraEntity, Minecraft.getInstance().player);
+                Entity cameraEntity = Objects.requireNonNullElse(Minecraft.getInstance().getCameraEntity(), Minecraft.getInstance().player);
 
                 String foundRadius = "%.2f".formatted(Math.sqrt(closestBlock.distToCenterSqr(cameraEntity.getEyePosition(0))));
                 sendFeedback(

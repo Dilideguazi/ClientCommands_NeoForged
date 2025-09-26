@@ -239,7 +239,7 @@ public class FindItemCommand {
 
         @Override
         protected void onTick() {
-            Entity entity = Minecraft.getInstance().cameraEntity;
+            Entity entity = Minecraft.getInstance().getCameraEntity();
             if (entity == null) {
                 _break();
                 return;
@@ -433,7 +433,7 @@ public class FindItemCommand {
 
         @Override
         protected void onTick() {
-            Entity cameraEntity = Minecraft.getInstance().cameraEntity;
+            Entity cameraEntity = Minecraft.getInstance().getCameraEntity();
             if (cameraEntity == null) {
                 _break();
                 return;

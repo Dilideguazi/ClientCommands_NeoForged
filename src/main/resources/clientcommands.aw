@@ -35,9 +35,6 @@ accessible field com/mojang/blaze3d/platform/ScreenManager monitors Lit/unimi/ds
 accessible method net/minecraft/world/entity/player/Inventory addResource (ILnet/minecraft/world/item/ItemStack;)I
 accessible method net/minecraft/world/entity/player/Inventory hasRemainingSpaceForItem (Lnet/minecraft/world/item/ItemStack;Lnet/minecraft/world/item/ItemStack;)Z
 
-# chat
-accessible method net/minecraft/client/Minecraft openChatScreen (Ljava/lang/String;)V
-
 # ckit
 accessible field net/minecraft/world/entity/LivingEntity equipment Lnet/minecraft/world/entity/EntityEquipment;
 

@@ -130,7 +130,7 @@ public class CCrackRng {
     public static void onEntityCreation(ClientboundAddEntityPacket packet) {
         if (Configs.playerCrackState == PlayerRandCracker.CrackState.CRACKING) {
             if (CCrackRng.expectedItems > 0) {
-                float nextFloat = (float) Math.sqrt(packet.getXa() * packet.getXa() + packet.getZa() * packet.getZa()) * 50f;
+                float nextFloat = (float) Math.sqrt(packet.getMovement().x * packet.getMovement().x + packet.getMovement().z * packet.getMovement().z) * 50f;
                 CCrackRng.nextFloats[NUM_THROWS - CCrackRng.expectedItems] = nextFloat;
                 CCrackRng.expectedItems--;
             }

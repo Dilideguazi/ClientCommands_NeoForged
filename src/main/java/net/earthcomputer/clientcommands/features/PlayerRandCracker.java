@@ -619,6 +619,7 @@ public class PlayerRandCracker {
         RECREATED("recreated"),
         RESPIRATION("respiration"),
         SHIELD("shield"),
+        SHOULDER_PARROT("shoulderParrot"),
         SOUL_SPEED("soulSpeed"),
         SPRINT("sprint"),
         SWIM("swim"),
