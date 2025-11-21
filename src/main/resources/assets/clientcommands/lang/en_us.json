@@ -234,6 +234,10 @@
   "commands.cpos.level.the_end": "the End",
   "commands.cpos.level.the_nether": "the Nether",
 
+  "commands.cposteffect.apply.success": "Successfully applied post effect %s",
+  "commands.cposteffect.reset.success": "Successfully reset post effect",
+  "commands.cposteffect.unknownPostEffect": "Unknown post effect %s",
+
   "commands.cpredictbrushables.foundBrushableBlock": "Found %s at %s with item %s %s",
   "commands.cpredictbrushables.notFound": "No brushable blocks found",
   "commands.cpredictbrushables.starting": "Searching for brushable blocks",

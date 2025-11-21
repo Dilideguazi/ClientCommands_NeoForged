@@ -175,6 +175,7 @@ public class ClientCommands implements ClientModInitializer {
         // PlayerInfoCommand.register(dispatcher);
         PluginsCommand.register(dispatcher);
         PosCommand.register(dispatcher);
+        PostEffectCommand.register(dispatcher);
         PredictBrushablesCommand.register(dispatcher);
         RelogCommand.register(dispatcher);
         RenderCommand.register(dispatcher);

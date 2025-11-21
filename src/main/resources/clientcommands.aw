@@ -50,6 +50,12 @@ accessible method net/minecraft/client/Screenshot getFile (Ljava/io/File;)Ljava/
 # cpermissionlevel
 accessible method net/minecraft/client/player/LocalPlayer getPermissionLevel ()I
 
+# cposteffect
+accessible field net/minecraft/client/renderer/GameRenderer BLUR_POST_CHAIN_ID Lnet/minecraft/resources/ResourceLocation;
+accessible method net/minecraft/client/renderer/GameRenderer setPostEffect (Lnet/minecraft/resources/ResourceLocation;)V
+accessible field net/minecraft/client/renderer/ShaderManager compilationCache Lnet/minecraft/client/renderer/ShaderManager$CompilationCache;
+accessible field net/minecraft/client/renderer/ShaderManager$CompilationCache configs Lnet/minecraft/client/renderer/ShaderManager$Configs;
+
 # Game Options
 accessible field net/minecraft/client/OptionInstance value Ljava/lang/Object;
 
