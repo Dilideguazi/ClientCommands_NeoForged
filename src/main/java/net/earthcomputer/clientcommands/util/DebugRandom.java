@@ -8,6 +8,7 @@ import it.unimi.dsi.fastutil.ints.IntSet;
 import it.unimi.dsi.fastutil.objects.Object2IntMap;
 import it.unimi.dsi.fastutil.objects.Object2IntOpenHashMap;
 import net.earthcomputer.clientcommands.ClientCommands;
+import net.minecraft.FileUtil;
 import net.minecraft.core.registries.BuiltInRegistries;
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.nbt.NbtIo;
@@ -124,7 +125,7 @@ public class DebugRandom extends LegacyRandomSource {
         super(RandomSupport.generateUniqueSeed());
 
         this.tagToSaveSupplier = CompoundTag::new;
-        this.idSupplier = () -> level.dimension().location().toString();
+        this.idSupplier = () -> FileUtil.sanitizeName(level.dimension().location().toString());
 
         this.stackTraces.add(this.stackTracesThisTick);
         try {
