@@ -8,11 +8,11 @@ import it.unimi.dsi.fastutil.ints.IntSet;
 import it.unimi.dsi.fastutil.objects.Object2IntMap;
 import it.unimi.dsi.fastutil.objects.Object2IntOpenHashMap;
 import net.earthcomputer.clientcommands.ClientCommands;
-import net.minecraft.FileUtil;
 import net.minecraft.core.registries.BuiltInRegistries;
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.nbt.NbtIo;
-import net.minecraft.resources.ResourceLocation;
+import net.minecraft.resources.Identifier;
+import net.minecraft.util.FileUtil;
 import net.minecraft.util.ProblemReporter;
 import net.minecraft.world.entity.Entity;
 import net.minecraft.world.entity.EntityType;
@@ -20,7 +20,7 @@ import net.minecraft.world.level.Level;
 import net.minecraft.world.level.levelgen.LegacyRandomSource;
 import net.minecraft.world.level.levelgen.RandomSupport;
 import net.minecraft.world.level.storage.TagValueOutput;
-import org.jetbrains.annotations.Nullable;
+import org.jspecify.annotations.Nullable;
 import org.slf4j.Logger;
 
 import javax.swing.DefaultListModel;
@@ -58,8 +58,10 @@ import java.util.zip.GZIPOutputStream;
 public class DebugRandom extends LegacyRandomSource {
     static final Logger LOGGER = LogUtils.getLogger();
 
+    @Nullable
     public static final EntityType<?> DEBUG_ENTITY_TYPE;
-    public static final ResourceLocation DEBUG_DIMENSION;
+    @Nullable
+    public static final Identifier DEBUG_DIMENSION;
     public static final boolean SAVE_ENTITY_TAG = Boolean.parseBoolean(System.getProperty("clientcommands.debugEntityRng.saveTag", "true"));
 
     static {
@@ -67,14 +69,14 @@ public class DebugRandom extends LegacyRandomSource {
         if (debugEntityType == null) {
             DEBUG_ENTITY_TYPE = null;
         } else {
-            DEBUG_ENTITY_TYPE = BuiltInRegistries.ENTITY_TYPE.getValue(ResourceLocation.parse(debugEntityType));
+            DEBUG_ENTITY_TYPE = BuiltInRegistries.ENTITY_TYPE.getValue(Identifier.parse(debugEntityType));
         }
 
         String debugDimensionStr = System.getProperty("clientcommands.debugDimensionRng");
         if (debugDimensionStr == null) {
             DEBUG_DIMENSION = null;
         } else {
-            DEBUG_DIMENSION = ResourceLocation.tryParse(debugDimensionStr);
+            DEBUG_DIMENSION = Identifier.tryParse(debugDimensionStr);
         }
     }
 
@@ -125,7 +127,7 @@ public class DebugRandom extends LegacyRandomSource {
         super(RandomSupport.generateUniqueSeed());
 
         this.tagToSaveSupplier = CompoundTag::new;
-        this.idSupplier = () -> FileUtil.sanitizeName(level.dimension().location().toString());
+        this.idSupplier = () -> FileUtil.sanitizeName(level.dimension().identifier().toString());
 
         this.stackTraces.add(this.stackTracesThisTick);
         try {
@@ -355,6 +357,7 @@ class DebugRandomSourcePanel extends JPanel {
         add(bottomPanel, BorderLayout.SOUTH);
     }
 
+    @SuppressWarnings("ConstantValue")
     private void setSelectedStackTrace(int selectedStackTrace) {
         this.selectedStackTrace = selectedStackTrace;
         if (randomCallsList != null) {

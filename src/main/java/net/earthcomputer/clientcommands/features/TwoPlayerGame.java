@@ -25,8 +25,8 @@ import net.minecraft.network.chat.ClickEvent;
 import net.minecraft.network.chat.Component;
 import net.minecraft.network.chat.HoverEvent;
 import net.minecraft.network.chat.MutableComponent;
-import net.minecraft.resources.ResourceLocation;
-import org.jetbrains.annotations.Nullable;
+import net.minecraft.resources.Identifier;
+import org.jspecify.annotations.Nullable;
 
 import java.time.Duration;
 import java.util.Collections;
@@ -41,22 +41,22 @@ import static dev.xpple.clientarguments.arguments.CGameProfileArgument.*;
 import static net.fabricmc.fabric.api.client.command.v2.ClientCommandManager.*;
 
 public class TwoPlayerGame<T, S extends Screen> {
-    public static final Map<ResourceLocation, TwoPlayerGame<?, ?>> TYPE_BY_NAME = new LinkedHashMap<>();
+    public static final Map<Identifier, TwoPlayerGame<?, ?>> TYPE_BY_NAME = new LinkedHashMap<>();
     private static final SimpleCommandExceptionType PLAYER_NOT_FOUND_EXCEPTION = new SimpleCommandExceptionType(Component.translatable("twoPlayerGame.playerNotFound"));
     private static final SimpleCommandExceptionType NO_GAME_WITH_PLAYER_EXCEPTION = new SimpleCommandExceptionType(Component.translatable("twoPlayerGame.noGameWithPlayer"));
 
-    public static final TwoPlayerGame<TicTacToeCommand.TicTacToeGame, TicTacToeCommand.TicTacToeGameScreen> TIC_TAC_TOE_GAME_TYPE = register(new TwoPlayerGame<>("commands.ctictactoe.name", "ctictactoe", ResourceLocation.fromNamespaceAndPath("clientcommands", "tictactoe"), (opponent, firstPlayer) -> new TicTacToeCommand.TicTacToeGame(opponent, firstPlayer ? TicTacToeCommand.TicTacToeGame.Mark.CROSS : TicTacToeCommand.TicTacToeGame.Mark.NOUGHT), TicTacToeCommand.TicTacToeGameScreen::new));
-    public static final TwoPlayerGame<ConnectFourCommand.ConnectFourGame, ConnectFourCommand.ConnectFourGameScreen > CONNECT_FOUR_GAME_TYPE = register(new TwoPlayerGame<>("commands.cconnectfour.name", "cconnectfour", ResourceLocation.fromNamespaceAndPath("clientcommands", "connectfour"), (opponent, firstPlayer) -> new ConnectFourCommand.ConnectFourGame(opponent, firstPlayer ? ConnectFourCommand.Piece.RED : ConnectFourCommand.Piece.YELLOW), ConnectFourCommand.ConnectFourGameScreen::new));
+    public static final TwoPlayerGame<TicTacToeCommand.TicTacToeGame, TicTacToeCommand.TicTacToeGameScreen> TIC_TAC_TOE_GAME_TYPE = register(new TwoPlayerGame<>("commands.ctictactoe.name", "ctictactoe", Identifier.fromNamespaceAndPath("clientcommands", "tictactoe"), (opponent, firstPlayer) -> new TicTacToeCommand.TicTacToeGame(opponent, firstPlayer ? TicTacToeCommand.TicTacToeGame.Mark.CROSS : TicTacToeCommand.TicTacToeGame.Mark.NOUGHT), TicTacToeCommand.TicTacToeGameScreen::new));
+    public static final TwoPlayerGame<ConnectFourCommand.ConnectFourGame, ConnectFourCommand.ConnectFourGameScreen > CONNECT_FOUR_GAME_TYPE = register(new TwoPlayerGame<>("commands.cconnectfour.name", "cconnectfour", Identifier.fromNamespaceAndPath("clientcommands", "connectfour"), (opponent, firstPlayer) -> new ConnectFourCommand.ConnectFourGame(opponent, firstPlayer ? ConnectFourCommand.Piece.RED : ConnectFourCommand.Piece.YELLOW), ConnectFourCommand.ConnectFourGameScreen::new));
 
     private final Component translation;
     private final String command;
-    private final ResourceLocation id;
+    private final Identifier id;
     private final Set<UUID> pendingInvites;
     private final Map<UUID, T> activeGames;
     private final GameFactory<T> gameFactory;
     private final ScreenFactory<T, S> screenFactory;
 
-    TwoPlayerGame(@Translatable String translationKey, String command, ResourceLocation id, GameFactory<T> gameFactory, ScreenFactory<T, S> screenFactory) {
+    TwoPlayerGame(@Translatable String translationKey, String command, Identifier id, GameFactory<T> gameFactory, ScreenFactory<T, S> screenFactory) {
         this.translation = Component.translatable(translationKey);
         this.command = command;
         this.id = id;
@@ -72,7 +72,7 @@ public class TwoPlayerGame<T, S extends Screen> {
     }
 
     @Nullable
-    public static TwoPlayerGame<?, ?> getById(ResourceLocation id) {
+    public static TwoPlayerGame<?, ?> getById(Identifier id) {
         return TYPE_BY_NAME.get(id);
     }
 
@@ -96,7 +96,7 @@ public class TwoPlayerGame<T, S extends Screen> {
         return this.translation;
     }
 
-    public ResourceLocation getId() {
+    public Identifier getId() {
         return this.id;
     }
 

@@ -9,9 +9,12 @@ import net.fabricmc.fabric.api.client.event.lifecycle.v1.ClientTickEvents;
 import net.fabricmc.fabric.api.client.rendering.v1.RenderStateDataKey;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.renderer.RenderPipelines;
-import net.minecraft.client.renderer.RenderType;
+import net.minecraft.client.renderer.rendertype.LayeringTransform;
+import net.minecraft.client.renderer.rendertype.OutputTarget;
+import net.minecraft.client.renderer.rendertype.RenderSetup;
+import net.minecraft.client.renderer.rendertype.RenderType;
 import net.minecraft.client.renderer.state.LevelRenderState;
-import net.minecraft.resources.ResourceLocation;
+import net.minecraft.resources.Identifier;
 import net.minecraft.world.phys.AABB;
 import net.minecraft.world.phys.Vec3;
 
@@ -21,7 +24,6 @@ import java.util.Iterator;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
-import java.util.OptionalDouble;
 
 public class RenderQueue {
     private static int tickCounter = 0;
@@ -33,14 +35,17 @@ public class RenderQueue {
 
     private static final RenderPipeline LINES_NO_DEPTH_PIPELINE = RenderPipelines.register(
         RenderPipeline.builder(RenderPipelines.LINES_SNIPPET)
-            .withLocation(ResourceLocation.fromNamespaceAndPath("clientcommands", "pipeline/lines_no_depth"))
+            .withLocation(Identifier.fromNamespaceAndPath("clientcommands", "pipeline/lines_no_depth"))
             .withDepthTestFunction(DepthTestFunction.NO_DEPTH_TEST)
             .build()
     );
-    public static final RenderType LINES_NO_DEPTH_LAYER = RenderType.create("clientcommands_no_depth", 3 * 512, LINES_NO_DEPTH_PIPELINE, RenderType.CompositeState.builder()
-        .setLayeringState(RenderType.VIEW_OFFSET_Z_LAYERING)
-        .setLineState(new RenderType.LineStateShard(OptionalDouble.of(Line.THICKNESS)))
-        .createCompositeState(false));
+    public static final RenderType LINES_NO_DEPTH_LAYER = RenderType.create(
+        "clientcommands_no_depth",
+        RenderSetup.builder(LINES_NO_DEPTH_PIPELINE)
+            .setLayeringTransform(LayeringTransform.VIEW_OFFSET_Z_LAYERING)
+            .setOutputTarget(OutputTarget.ITEM_ENTITY_TARGET)
+            .createRenderSetup()
+    );
 
     static {
         ClientTickEvents.START_CLIENT_TICK.register(RenderQueue::tick);

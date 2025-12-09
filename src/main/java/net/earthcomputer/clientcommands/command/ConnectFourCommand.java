@@ -17,8 +17,8 @@ import net.minecraft.client.multiplayer.ClientPacketListener;
 import net.minecraft.client.multiplayer.PlayerInfo;
 import net.minecraft.client.renderer.RenderPipelines;
 import net.minecraft.network.chat.Component;
-import net.minecraft.resources.ResourceLocation;
-import org.jetbrains.annotations.Nullable;
+import net.minecraft.resources.Identifier;
+import org.jspecify.annotations.Nullable;
 import org.slf4j.Logger;
 
 import java.util.UUID;
@@ -32,6 +32,9 @@ public class ConnectFourCommand {
 
     public static void onPutConnectFourPieceC2CPacket(PutConnectFourPieceC2CPacket packet) {
         UUID senderUUID = packet.senderUUID();
+        if (senderUUID == null) {
+            return;
+        }
         ConnectFourGame game = TwoPlayerGame.CONNECT_FOUR_GAME_TYPE.getActiveGame(senderUUID);
         if (game == null) {
             return;
@@ -46,7 +49,7 @@ public class ConnectFourCommand {
         public final PlayerInfo opponent;
         public final Piece yourPiece;
         public Piece activePiece;
-        public final Piece[][] board;
+        public final @Nullable Piece[][] board;
         @Nullable
         public Winner winner;
 
@@ -254,8 +257,8 @@ public class ConnectFourCommand {
     public static class ConnectFourGameScreen extends Screen {
         private final ConnectFourGame game;
 
-        private static final ResourceLocation BOARD_TEXTURE = ResourceLocation.fromNamespaceAndPath("clientcommands", "textures/connect_four/board.png");
-        private static final ResourceLocation PIECES_TEXTURE = ResourceLocation.fromNamespaceAndPath("clientcommands", "textures/connect_four/pieces.png");
+        private static final Identifier BOARD_TEXTURE = Identifier.fromNamespaceAndPath("clientcommands", "textures/connect_four/board.png");
+        private static final Identifier PIECES_TEXTURE = Identifier.fromNamespaceAndPath("clientcommands", "textures/connect_four/pieces.png");
 
         private static final int SCALE = 4;
 

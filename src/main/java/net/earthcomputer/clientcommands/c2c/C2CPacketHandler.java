@@ -34,8 +34,7 @@ import net.minecraft.network.protocol.Packet;
 import net.minecraft.network.protocol.ProtocolInfoBuilder;
 import net.minecraft.world.entity.player.ProfileKeyPair;
 import net.minecraft.world.entity.player.ProfilePublicKey;
-import org.jetbrains.annotations.NotNull;
-import org.jetbrains.annotations.Nullable;
+import org.jspecify.annotations.Nullable;
 import org.slf4j.Logger;
 
 import java.security.PublicKey;
@@ -174,7 +173,7 @@ public class C2CPacketHandler implements C2CPacketListener {
             LOGGER.error("Found extra bytes while reading C2C packet {}", packet.type());
             return false;
         }
-        if (!packet.sender().equals(sender)) {
+        if (!sender.equals(packet.sender())) {
             LOGGER.error("Detected mismatching packet sender. Expected {}, got {}", sender, packet.sender());
             return false;
         }
@@ -222,7 +221,7 @@ public class C2CPacketHandler implements C2CPacketListener {
         ConnectFourCommand.onPutConnectFourPieceC2CPacket(packet);
     }
 
-    public static @Nullable C2CFriendlyByteBuf wrapByteBuf(ByteBuf buf, String sender, UUID senderUUID) {
+    public static @Nullable C2CFriendlyByteBuf wrapByteBuf(ByteBuf buf, @Nullable String sender, @Nullable UUID senderUUID) {
         ClientPacketListener connection = Minecraft.getInstance().getConnection();
         if (connection == null) {
             return null;
@@ -231,7 +230,7 @@ public class C2CPacketHandler implements C2CPacketListener {
     }
 
     @Override
-    public @NotNull ConnectionProtocol protocol() {
+    public ConnectionProtocol protocol() {
         return ConnectionProtocol.PLAY;
     }
 

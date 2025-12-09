@@ -19,8 +19,8 @@ import net.minecraft.network.chat.HoverEvent;
 import net.minecraft.network.chat.MutableComponent;
 import net.minecraft.network.chat.Style;
 import net.minecraft.network.chat.TextColor;
-import net.minecraft.resources.ResourceLocation;
-import org.jetbrains.annotations.Nullable;
+import net.minecraft.resources.Identifier;
+import org.jspecify.annotations.Nullable;
 
 import java.net.URI;
 import java.net.URISyntaxException;
@@ -85,6 +85,7 @@ public class ExtendedMarkdownArgument implements ArgumentType<MutableComponent> 
         private static final int MAX_NESTING = 50;
 
         private final StringReader reader;
+        @Nullable
         private Consumer<SuggestionsBuilder> suggestor;
 
         public Parser(StringReader reader) {
@@ -409,7 +410,7 @@ public class ExtendedMarkdownArgument implements ArgumentType<MutableComponent> 
                 .put("white",  new Styler((s, o) -> s.applyFormat(ChatFormatting.WHITE), 0))
                 .put("yellow", new Styler((s, o) -> s.applyFormat(ChatFormatting.YELLOW), 0))
 
-                .put("font", new Styler((s, o) -> s.withFont(new FontDescription.Resource(ResourceLocation.read(new StringReader(o.getFirst())))), 1, "alt", "default"))
+                .put("font", new Styler((s, o) -> s.withFont(new FontDescription.Resource(Identifier.read(new StringReader(o.getFirst())))), 1, "alt", "default"))
                 .put("hex", new Styler((s, o) -> s.withColor(TextColor.fromRgb(parseHex(o.getFirst()))), 1))
                 .put("insert", new Styler((s, o) -> s.withInsertion(o.getFirst()), 1))
 

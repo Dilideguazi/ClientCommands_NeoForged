@@ -10,7 +10,7 @@ import net.minecraft.network.chat.Component;
 import net.minecraft.network.chat.MutableComponent;
 import net.minecraft.resources.ResourceKey;
 import net.minecraft.world.level.Level;
-import org.jetbrains.annotations.Nullable;
+import org.jspecify.annotations.Nullable;
 
 import static dev.xpple.clientarguments.arguments.CBlockPosArgument.*;
 import static dev.xpple.clientarguments.arguments.CDimensionArgument.*;
@@ -122,11 +122,11 @@ public class PosCommand {
      * if that fails.
      */
     private static String getLevelName(ResourceKey<Level> level) {
-        String levelNameKey = "commands.cpos.level." + level.location().getPath();
+        String levelNameKey = "commands.cpos.level." + level.identifier().getPath();
         if (I18n.exists(levelNameKey)) {
             return I18n.get(levelNameKey);
         } else {
-            return level.location().getPath();
+            return level.identifier().getPath();
         }
     }
 

@@ -4,14 +4,15 @@ import com.llamalad7.mixinextras.injector.ModifyReturnValue;
 import net.earthcomputer.clientcommands.interfaces.IEntity_Glowable;
 import net.earthcomputer.clientcommands.interfaces.ILivingEntityRenderState_Glowable;
 import net.minecraft.client.model.EntityModel;
-import net.minecraft.client.renderer.RenderType;
 import net.minecraft.client.renderer.entity.EntityRenderer;
 import net.minecraft.client.renderer.entity.EntityRendererProvider;
 import net.minecraft.client.renderer.entity.LivingEntityRenderer;
 import net.minecraft.client.renderer.entity.state.LivingEntityRenderState;
-import net.minecraft.resources.ResourceLocation;
+import net.minecraft.client.renderer.rendertype.RenderType;
+import net.minecraft.client.renderer.rendertype.RenderTypes;
+import net.minecraft.resources.Identifier;
 import net.minecraft.world.entity.LivingEntity;
-import org.jetbrains.annotations.Nullable;
+import org.jspecify.annotations.Nullable;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.Shadow;
 import org.spongepowered.asm.mixin.injection.At;
@@ -21,7 +22,7 @@ import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 @Mixin(LivingEntityRenderer.class)
 public abstract class LivingEntityRendererMixin<T extends LivingEntity, S extends LivingEntityRenderState, M extends EntityModel<? super S>> extends EntityRenderer<T, S> {
     @Shadow
-    public abstract ResourceLocation getTextureLocation(S renderState);
+    public abstract Identifier getTextureLocation(S renderState);
 
     protected LivingEntityRendererMixin(EntityRendererProvider.Context ctx) {
         super(ctx);
@@ -31,7 +32,7 @@ public abstract class LivingEntityRendererMixin<T extends LivingEntity, S extend
     @Nullable
     private RenderType onGetRenderType(@Nullable RenderType original, S renderState) {
         if (original == null && ((ILivingEntityRenderState_Glowable) renderState).clientcommands_hasGlowingTicket()) {
-            return RenderType.outline(getTextureLocation(renderState));
+            return RenderTypes.outline(getTextureLocation(renderState));
         }
 
         return original;

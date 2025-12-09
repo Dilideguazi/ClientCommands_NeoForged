@@ -3,12 +3,13 @@ package net.earthcomputer.clientcommands.features;
 import com.google.gson.Gson;
 import net.minecraft.ChatFormatting;
 import net.minecraft.client.resources.language.I18n;
-import org.jetbrains.annotations.Nullable;
+import org.jspecify.annotations.Nullable;
 
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.net.MalformedURLException;
+import java.net.URI;
 import java.net.URL;
 import java.net.URLEncoder;
 import java.nio.charset.StandardCharsets;
@@ -168,7 +169,7 @@ public class WikiRetriever {
         }
         matcher.appendTail(raw);
 
-        if (raw.length() == 0) {
+        if (raw.isEmpty()) {
             return ChatFormatting.ITALIC + I18n.get("commands.cwiki.noContent");
         }
 
@@ -187,7 +188,7 @@ public class WikiRetriever {
         URL url;
         try {
             String encodedPage = URLEncoder.encode(pageName, StandardCharsets.UTF_8);
-            url = new URL(String.format(PAGE_SUMMARY_QUERY, encodedPage));
+            url = URI.create(String.format(PAGE_SUMMARY_QUERY, encodedPage)).toURL();
         } catch (MalformedURLException e) {
             return null;
         }
@@ -199,7 +200,7 @@ public class WikiRetriever {
             return null;
         }
 
-        if (result.query.pages.isEmpty()) {
+        if (result.query == null || result.query.pages == null || result.query.pages.isEmpty()) {
             return null;
         }
         var page = result.query.pages.values().iterator().next();
@@ -212,15 +213,21 @@ public class WikiRetriever {
 
     @SuppressWarnings("unused")
     private static class QueryResult {
+        @Nullable
         public String batchcomplete;
+        @Nullable
         public Query query;
         private static class Query {
             @SuppressWarnings("MismatchedQueryAndUpdateOfCollection")
+            @Nullable
             private Map<String, Page> pages;
             private static class Page {
                 public int pageid;
+                @Nullable
                 public String title;
+                @Nullable
                 public String extract;
+                @Nullable
                 public String missing;
             }
         }

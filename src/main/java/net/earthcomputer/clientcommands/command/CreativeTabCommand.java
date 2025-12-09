@@ -13,7 +13,6 @@ import net.fabricmc.fabric.api.client.command.v2.FabricClientCommandSource;
 import net.fabricmc.fabric.api.itemgroup.v1.FabricItemGroup;
 import net.fabricmc.loader.api.FabricLoader;
 import net.minecraft.SharedConstants;
-import net.minecraft.Util;
 import net.minecraft.client.Minecraft;
 import net.minecraft.commands.CommandBuildContext;
 import net.minecraft.core.HolderLookup;
@@ -26,7 +25,8 @@ import net.minecraft.nbt.NbtIo;
 import net.minecraft.nbt.NbtOps;
 import net.minecraft.nbt.Tag;
 import net.minecraft.network.chat.Component;
-import net.minecraft.resources.ResourceLocation;
+import net.minecraft.resources.Identifier;
+import net.minecraft.util.Util;
 import net.minecraft.util.datafix.fixes.References;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.ItemStackLinkedSet;
@@ -119,7 +119,7 @@ public class CreativeTabCommand {
             throw ALREADY_EXISTS_EXCEPTION.create(name);
         }
 
-        final ResourceLocation identifier = ResourceLocation.tryParse("clientcommands:" + name);
+        final Identifier identifier = Identifier.tryParse("clientcommands:" + name);
         if (identifier == null) {
             throw ILLEGAL_CHARACTER_EXCEPTION.create(name);
         }
@@ -217,7 +217,7 @@ public class CreativeTabCommand {
             throw NOT_FOUND_EXCEPTION.create(name);
         }
 
-        ResourceLocation identifier = ResourceLocation.tryParse("clientcommands:" + _new);
+        Identifier identifier = Identifier.tryParse("clientcommands:" + _new);
         if (identifier == null) {
             throw ILLEGAL_CHARACTER_EXCEPTION.create(_new);
         }
@@ -274,7 +274,7 @@ public class CreativeTabCommand {
         DataFixer dataFixer = Minecraft.getInstance().getFixerUpper();
         if (fileVersion >= currentVersion) {
             for (var entry : compoundTag.entrySet()) {
-                if (ResourceLocation.tryParse("clientcommands:" + entry.getKey()) == null) {
+                if (Identifier.tryParse("clientcommands:" + entry.getKey()) == null) {
                     LOGGER.warn("Skipping creative tab with invalid name {}", entry.getKey());
                     return;
                 }
@@ -288,7 +288,7 @@ public class CreativeTabCommand {
             }
         } else {
             for (var entry : compoundTag.entrySet()) {
-                if (ResourceLocation.tryParse("clientcommands:" + entry.getKey()) == null) {
+                if (Identifier.tryParse("clientcommands:" + entry.getKey()) == null) {
                     LOGGER.warn("Skipping creative tab with invalid name {}", entry.getKey());
                     return;
                 }
@@ -321,7 +321,7 @@ public class CreativeTabCommand {
 
     private record Tab(CompoundTag icon, ListTag items) {
         void registerCreativeTab(HolderLookup.Provider builtinLookupProvider, String key) {
-            Registry.register(BuiltInRegistries.CREATIVE_MODE_TAB, ResourceLocation.fromNamespaceAndPath("clientcommands", key), FabricItemGroup.builder()
+            Registry.register(BuiltInRegistries.CREATIVE_MODE_TAB, Identifier.fromNamespaceAndPath("clientcommands", key), FabricItemGroup.builder()
                     .title(Component.literal(key))
                     .icon(() -> singleItemFromNbt(builtinLookupProvider, icon))
                     .displayItems((displayContext, entries) -> {

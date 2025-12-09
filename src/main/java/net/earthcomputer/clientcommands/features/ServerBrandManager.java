@@ -3,27 +3,28 @@ package net.earthcomputer.clientcommands.features;
 import net.earthcomputer.clientcommands.event.ClientConnectionEvents;
 import net.minecraft.ChatFormatting;
 import net.minecraft.client.Minecraft;
+import net.minecraft.client.multiplayer.ClientPacketListener;
 import net.minecraft.network.chat.Component;
 
 public class ServerBrandManager {
 
-    private static String serverBrand = "vanilla";
     private static boolean hasWarnedRng = false;
 
     public static void registerEvents() {
         ClientConnectionEvents.DISCONNECT.register(ServerBrandManager::onDisconnect);
     }
 
-    public static void setServerBrand(String brand) {
-        serverBrand = brand;
-    }
-
     public static String getServerBrand() {
-        return serverBrand;
+        ClientPacketListener connection = Minecraft.getInstance().getConnection();
+        if (connection == null) {
+            return "vanilla";
+        }
+        String brand = connection.serverBrand();
+        return brand == null ? "vanilla" : brand;
     }
 
     public static boolean isVanilla() {
-        return "vanilla".equals(serverBrand);
+        return "vanilla".equals(getServerBrand());
     }
 
     private static void onDisconnect() {

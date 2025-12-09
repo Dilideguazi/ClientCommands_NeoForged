@@ -48,11 +48,10 @@ accessible field net/minecraft/network/codec/IdDispatchCodec toId Lit/unimi/dsi/
 accessible method net/minecraft/client/Screenshot getFile (Ljava/io/File;)Ljava/io/File;
 
 # cpermissionlevel
-accessible method net/minecraft/client/player/LocalPlayer getPermissionLevel ()I
+#accessible method net/minecraft/client/player/LocalPlayer getPermissionLevel ()I
 
 # cposteffect
-accessible field net/minecraft/client/renderer/GameRenderer BLUR_POST_CHAIN_ID Lnet/minecraft/resources/ResourceLocation;
-accessible method net/minecraft/client/renderer/GameRenderer setPostEffect (Lnet/minecraft/resources/ResourceLocation;)V
+accessible method net/minecraft/client/renderer/GameRenderer setPostEffect (Lnet/minecraft/resources/Identifier;)V
 accessible field net/minecraft/client/renderer/ShaderManager compilationCache Lnet/minecraft/client/renderer/ShaderManager$CompilationCache;
 accessible field net/minecraft/client/renderer/ShaderManager$CompilationCache configs Lnet/minecraft/client/renderer/ShaderManager$Configs;
 
@@ -61,6 +60,9 @@ accessible field net/minecraft/client/OptionInstance value Ljava/lang/Object;
 
 # Length Extender
 accessible field net/minecraft/client/gui/components/EditBox maxLength I
+
+# Render Queue
+accessible method net/minecraft/client/renderer/rendertype/RenderType create (Ljava/lang/String;Lnet/minecraft/client/renderer/rendertype/RenderSetup;)Lnet/minecraft/client/renderer/rendertype/RenderType;
 
 # RNG Events
 accessible method net/minecraft/world/entity/Entity isInvulnerableToBase (Lnet/minecraft/world/damagesource/DamageSource;)Z

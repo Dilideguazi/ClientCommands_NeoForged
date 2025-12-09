@@ -4,7 +4,7 @@ import net.earthcomputer.clientcommands.features.ChatLengthExtender;
 import net.earthcomputer.clientcommands.interfaces.IEditBox;
 import net.minecraft.client.gui.components.EditBox;
 import net.minecraft.util.StringUtil;
-import org.jetbrains.annotations.Nullable;
+import org.jspecify.annotations.Nullable;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.Shadow;
 import org.spongepowered.asm.mixin.Unique;

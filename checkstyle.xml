@@ -24,5 +24,9 @@
             <property name="query" value="//STATIC_IMPORT[./LITERAL_STATIC and not(.//STAR)]"/>
             <message key="matchxpath.match" value="Static imports should always use wildcard imports"/>
         </module>
+
+        <module name="IllegalImport">
+            <property name="illegalClasses" value="org.jetbrains.annotations.Nullable, org.jetbrains.annotations.NotNull"/>
+        </module>
     </module>
 </module>

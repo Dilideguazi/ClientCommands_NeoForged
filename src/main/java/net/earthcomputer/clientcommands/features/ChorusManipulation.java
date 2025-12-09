@@ -16,7 +16,7 @@ import net.minecraft.world.level.Level;
 import net.minecraft.world.level.block.state.BlockState;
 import net.minecraft.world.phys.AABB;
 import net.minecraft.world.phys.Vec3;
-import org.jetbrains.annotations.Nullable;
+import org.jspecify.annotations.Nullable;
 
 import static net.earthcomputer.clientcommands.command.ClientCommandHelper.*;
 import static net.earthcomputer.clientcommands.features.PlayerRandCracker.*;
@@ -42,7 +42,10 @@ public class ChorusManipulation {
                 if (chorusGoalFrom != null && chorusGoalTo != null) {
                     LocalPlayer player = Minecraft.getInstance().player;
                     assert player != null;
-                    RenderQueue.addCuboid(RenderQueue.Layer.ON_TOP, GOAL_POS_KEY, getTargetArea(player.position()), 0xff55ff, 1);
+                    AABB targetArea = getTargetArea(player.position());
+                    if (targetArea != null) {
+                        RenderQueue.addCuboid(RenderQueue.Layer.ON_TOP, GOAL_POS_KEY, targetArea, 0xff55ff, 1);
+                    }
                 }
             }
         });
@@ -161,6 +164,7 @@ public class ChorusManipulation {
      * @return The Position, where the player lands
      * @see net.minecraft.world.entity.LivingEntity#randomTeleport(double, double, double, boolean)  (Vec3d)
      */
+    @Nullable
     public static Vec3 canTeleport(AABB goalArea, Vec3 goalVec) {
         BlockPos blockPos = BlockPos.containing(goalVec);
         Level level = Minecraft.getInstance().level;

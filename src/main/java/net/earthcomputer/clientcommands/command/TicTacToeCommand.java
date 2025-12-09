@@ -14,8 +14,8 @@ import net.minecraft.client.input.MouseButtonEvent;
 import net.minecraft.client.multiplayer.PlayerInfo;
 import net.minecraft.client.renderer.RenderPipelines;
 import net.minecraft.network.chat.Component;
-import net.minecraft.resources.ResourceLocation;
-import org.jetbrains.annotations.Nullable;
+import net.minecraft.resources.Identifier;
+import org.jspecify.annotations.Nullable;
 
 import java.util.UUID;
 
@@ -27,6 +27,10 @@ public class TicTacToeCommand {
     public static void onPutTicTacToeMarkC2CPacket(PutTicTacToeMarkC2CPacket packet) {
         String sender = packet.sender();
         UUID senderUUID = packet.senderUUID();
+        if (sender == null || senderUUID == null) {
+            return;
+        }
+
         TicTacToeGame game = TwoPlayerGame.TIC_TAC_TOE_GAME_TYPE.getActiveGame(senderUUID);
         if (game == null) {
             return;
@@ -46,7 +50,7 @@ public class TicTacToeCommand {
     public static class TicTacToeGame {
         public final PlayerInfo opponent;
 
-        private final Mark[][] board = new Mark[3][3];
+        private final @Nullable Mark[][] board = new Mark[3][3];
         private final Mark yourMarks;
         private boolean yourTurn;
 
@@ -117,8 +121,8 @@ public class TicTacToeCommand {
     public static class TicTacToeGameScreen extends Screen {
         private final TicTacToeGame game;
 
-        private static final ResourceLocation GRID_TEXTURE = ResourceLocation.fromNamespaceAndPath("clientcommands", "textures/tic_tac_toe/grid.png");
-        private static final ResourceLocation MARKS_TEXTURE = ResourceLocation.fromNamespaceAndPath("clientcommands", "textures/tic_tac_toe/marks.png");
+        private static final Identifier GRID_TEXTURE = Identifier.fromNamespaceAndPath("clientcommands", "textures/tic_tac_toe/grid.png");
+        private static final Identifier MARKS_TEXTURE = Identifier.fromNamespaceAndPath("clientcommands", "textures/tic_tac_toe/marks.png");
 
         private static final int GRID_SIZE_TEXTURE = 512;
         private static final int MARK_SIZE_TEXTURE = 152;
@@ -144,7 +148,7 @@ public class TicTacToeCommand {
             guiGraphics.drawString(this.font, Component.translatable("ticTacToeGame.playingWith", this.game.yourMarks.name), startX, startY - 10, 0xff_ffffff);
 
             guiGraphics.blit(RenderPipelines.GUI_TEXTURED, GRID_TEXTURE, startX, startY, 0, 0, GRID_SIZE, GRID_SIZE, GRID_SIZE_TEXTURE, GRID_SIZE_TEXTURE, GRID_SIZE_TEXTURE, GRID_SIZE_TEXTURE);
-            TicTacToeGame.Mark[][] board = this.game.board;
+            TicTacToeGame.@Nullable Mark[][] board = this.game.board;
 
             for (byte x = 0; x < 3; x++) {
                 for (byte y = 0; y < 3; y++) {

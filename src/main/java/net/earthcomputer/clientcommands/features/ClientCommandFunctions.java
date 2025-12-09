@@ -12,14 +12,14 @@ import net.earthcomputer.clientcommands.Configs;
 import net.earthcomputer.clientcommands.command.VarCommand;
 import net.fabricmc.fabric.api.client.command.v2.ClientCommandManager;
 import net.fabricmc.fabric.api.client.command.v2.FabricClientCommandSource;
-import net.minecraft.FileUtil;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.multiplayer.ServerData;
 import net.minecraft.client.server.IntegratedServer;
 import net.minecraft.commands.Commands;
 import net.minecraft.network.chat.Component;
+import net.minecraft.util.FileUtil;
 import net.minecraft.world.level.storage.LevelResource;
-import org.jetbrains.annotations.Nullable;
+import org.jspecify.annotations.Nullable;
 import org.slf4j.Logger;
 
 import java.io.BufferedWriter;
@@ -123,6 +123,7 @@ public class ClientCommandFunctions {
 
         try {
             var dispatcher = ClientCommandManager.getActiveDispatcher();
+            assert dispatcher != null : "Command dispatcher should not be null while calling ClientCommandFunctions.runStartup()";
             var packetListener = Minecraft.getInstance().getConnection();
             assert packetListener != null : "Network handler should not be null while calling ClientCommandFunctions.runStartup()";
             var source = (FabricClientCommandSource) packetListener.getSuggestionsProvider();

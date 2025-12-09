@@ -13,7 +13,7 @@ import net.minecraft.client.renderer.LevelTargetBundle;
 import net.minecraft.client.renderer.PostChainConfig;
 import net.minecraft.commands.SharedSuggestionProvider;
 import net.minecraft.network.chat.Component;
-import net.minecraft.resources.ResourceLocation;
+import net.minecraft.resources.Identifier;
 
 import java.util.Arrays;
 import java.util.Collection;
@@ -21,7 +21,7 @@ import java.util.Map;
 import java.util.concurrent.CompletableFuture;
 import java.util.stream.Stream;
 
-public class PostEffectArgument implements ArgumentType<ResourceLocation> {
+public class PostEffectArgument implements ArgumentType<Identifier> {
 
     private static final Collection<String> EXAMPLES = Arrays.asList("invert", "minecraft:spider", "clientcommands:crt");
 
@@ -31,14 +31,14 @@ public class PostEffectArgument implements ArgumentType<ResourceLocation> {
         return new PostEffectArgument();
     }
 
-    public static ResourceLocation getPostEffect(final CommandContext<FabricClientCommandSource> context, final String name) {
-        return context.getArgument(name, ResourceLocation.class);
+    public static Identifier getPostEffect(final CommandContext<FabricClientCommandSource> context, final String name) {
+        return context.getArgument(name, Identifier.class);
     }
 
     @Override
-    public ResourceLocation parse(StringReader reader) throws CommandSyntaxException {
+    public Identifier parse(StringReader reader) throws CommandSyntaxException {
         int start = reader.getCursor();
-        ResourceLocation postEffectId = ResourceLocation.read(reader);
+        Identifier postEffectId = Identifier.read(reader);
 
         boolean valid = getValidPostChains().anyMatch(id -> id.equals(postEffectId));
         if (!valid) {
@@ -58,7 +58,7 @@ public class PostEffectArgument implements ArgumentType<ResourceLocation> {
         return EXAMPLES;
     }
 
-    private Stream<ResourceLocation> getValidPostChains() {
+    private Stream<Identifier> getValidPostChains() {
         return Minecraft.getInstance().getShaderManager().compilationCache.configs.postChains().entrySet().stream()
             .filter(entry -> entry.getValue().passes().stream()
                 .flatMap(PostChainConfig.Pass::referencedTargets)

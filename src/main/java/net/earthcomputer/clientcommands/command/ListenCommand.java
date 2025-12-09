@@ -9,10 +9,10 @@ import com.mojang.brigadier.exceptions.SimpleCommandExceptionType;
 import com.mojang.logging.LogUtils;
 import it.unimi.dsi.fastutil.objects.ReferenceOpenHashSet;
 import net.earthcomputer.clientcommands.Configs;
+import net.earthcomputer.clientcommands.features.PacketDumper;
+import net.earthcomputer.clientcommands.util.MappingsHelper;
 import net.earthcomputer.clientcommands.util.ReflectionUtils;
 import net.earthcomputer.clientcommands.util.UnsafeUtils;
-import net.earthcomputer.clientcommands.util.MappingsHelper;
-import net.earthcomputer.clientcommands.features.PacketDumper;
 import net.fabricmc.fabric.api.client.command.v2.FabricClientCommandSource;
 import net.minecraft.ChatFormatting;
 import net.minecraft.core.Holder;
@@ -22,8 +22,8 @@ import net.minecraft.network.chat.Component;
 import net.minecraft.network.chat.HoverEvent;
 import net.minecraft.network.chat.MutableComponent;
 import net.minecraft.network.protocol.Packet;
+import net.minecraft.resources.Identifier;
 import net.minecraft.resources.ResourceKey;
-import net.minecraft.resources.ResourceLocation;
 import net.minecraft.world.level.ChunkPos;
 import org.slf4j.Logger;
 
@@ -61,7 +61,7 @@ public class ListenCommand {
 
     private static final Logger LOGGER = LogUtils.getLogger();
 
-    private static final Set<ResourceLocation> packets = new HashSet<>();
+    private static final Set<Identifier> packets = new HashSet<>();
 
     private static PacketCallback callback;
 
@@ -79,7 +79,7 @@ public class ListenCommand {
                 .executes(ctx -> clear(ctx.getSource()))));
     }
 
-    private static int add(FabricClientCommandSource source, ResourceLocation packetType) throws CommandSyntaxException {
+    private static int add(FabricClientCommandSource source, Identifier packetType) throws CommandSyntaxException {
         checkEnabled();
         if (!packets.add(packetType)) {
             throw ALREADY_LISTENING_EXCEPTION.create();
@@ -132,7 +132,7 @@ public class ListenCommand {
         return Command.SINGLE_SUCCESS;
     }
 
-    private static int remove(FabricClientCommandSource source, ResourceLocation packetType) throws CommandSyntaxException {
+    private static int remove(FabricClientCommandSource source, Identifier packetType) throws CommandSyntaxException {
         checkEnabled();
         if (!packets.remove(packetType)) {
             throw NOT_LISTENING_EXCEPTION.create();
@@ -149,7 +149,7 @@ public class ListenCommand {
             source.sendFeedback(Component.translatable("commands.clisten.list.none"));
         } else {
             source.sendFeedback(Component.translatable("commands.clisten.list"));
-            for (ResourceLocation packetType : packets) {
+            for (Identifier packetType : packets) {
                 source.sendFeedback(Component.literal(packetType.toString()));
             }
         }
@@ -194,7 +194,7 @@ public class ListenCommand {
             case Instant instant -> Component.translationArg(Date.from(instant));
             case UUID uuid -> Component.translationArg(uuid);
             case ChunkPos chunkPos -> Component.translationArg(chunkPos);
-            case ResourceLocation resourceLocation -> Component.translationArg(resourceLocation);
+            case Identifier identifier -> Component.translationArg(identifier);
             case Message message -> Component.translationArg(message);
             case Collection<?> collection -> {
                 MutableComponent component = Component.literal("[");
@@ -206,11 +206,11 @@ public class ListenCommand {
                 component.append(map.entrySet().stream().map(e -> serialize(e.getKey(), seen, depth + 1).copy().append("=").append(serialize(e.getValue(), seen, depth + 1))).reduce((l, r) -> l.append(", ").append(r)).orElse(Component.empty()));
                 yield component.append("}");
             }
-            case Registry<?> registry -> Component.translationArg(registry.key().location());
+            case Registry<?> registry -> Component.translationArg(registry.key().identifier());
             case ResourceKey<?> resourceKey -> {
                 MutableComponent component = Component.literal("{");
                 component.append("registry=").append(serialize(resourceKey.registry(), seen, depth + 1)).append(", ");
-                component.append("location=").append(serialize(resourceKey.location(), seen, depth + 1));
+                component.append("identifier=").append(serialize(resourceKey.identifier(), seen, depth + 1));
                 yield component.append("}");
             }
             case Holder<?> holder -> {

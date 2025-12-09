@@ -5,14 +5,14 @@ import com.mojang.brigadier.CommandDispatcher;
 import com.mojang.brigadier.context.CommandContext;
 import com.mojang.brigadier.exceptions.CommandSyntaxException;
 import com.mojang.datafixers.util.Either;
-import net.earthcomputer.clientcommands.features.ClientcommandsDataQueryHandler;
-import net.earthcomputer.clientcommands.util.CUtil;
-import net.earthcomputer.clientcommands.util.CComponentUtil;
-import net.earthcomputer.clientcommands.util.GuiBlocker;
-import net.earthcomputer.clientcommands.util.MathUtil;
 import net.earthcomputer.clientcommands.command.arguments.WithStringArgument;
+import net.earthcomputer.clientcommands.features.ClientcommandsDataQueryHandler;
 import net.earthcomputer.clientcommands.task.SimpleTask;
 import net.earthcomputer.clientcommands.task.TaskManager;
+import net.earthcomputer.clientcommands.util.CComponentUtil;
+import net.earthcomputer.clientcommands.util.CUtil;
+import net.earthcomputer.clientcommands.util.GuiBlocker;
+import net.earthcomputer.clientcommands.util.MathUtil;
 import net.fabricmc.fabric.api.client.command.v2.FabricClientCommandSource;
 import net.minecraft.ChatFormatting;
 import net.minecraft.client.Minecraft;
@@ -30,12 +30,13 @@ import net.minecraft.nbt.CompoundTag;
 import net.minecraft.nbt.ListTag;
 import net.minecraft.nbt.NbtOps;
 import net.minecraft.network.chat.Component;
+import net.minecraft.server.permissions.Permissions;
 import net.minecraft.util.Mth;
 import net.minecraft.world.Container;
 import net.minecraft.world.ContainerHelper;
 import net.minecraft.world.InteractionHand;
 import net.minecraft.world.entity.Entity;
-import net.minecraft.world.entity.animal.horse.AbstractChestedHorse;
+import net.minecraft.world.entity.animal.equine.AbstractChestedHorse;
 import net.minecraft.world.entity.player.Inventory;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.entity.vehicle.ContainerEntity;
@@ -59,7 +60,7 @@ import net.minecraft.world.level.chunk.status.ChunkStatus;
 import net.minecraft.world.phys.AABB;
 import net.minecraft.world.phys.BlockHitResult;
 import net.minecraft.world.phys.Vec3;
-import org.jetbrains.annotations.Nullable;
+import org.jspecify.annotations.Nullable;
 
 import java.util.HashSet;
 import java.util.Iterator;
@@ -109,7 +110,7 @@ public class FindItemCommand {
     private static SimpleTask makeFindItemsTask(String searchingForName, Predicate<ItemStack> searchingFor, boolean clickInventories, boolean searchNested, boolean keepSearching) {
         LocalPlayer player = Minecraft.getInstance().player;
         assert player != null;
-        if (player.hasPermissions(2) && !clickInventories) {
+        if (player.permissions().hasPermission(Permissions.COMMANDS_GAMEMASTER) && !clickInventories) {
             return new NbtQueryFindItemsTask(searchingForName, searchingFor, searchNested, keepSearching);
         } else {
             return new ClickInventoriesFindItemsTask(searchingForName, searchingFor, searchNested, keepSearching);
@@ -224,6 +225,7 @@ public class FindItemCommand {
     private static class ClickInventoriesFindItemsTask extends AbstractFindItemsTask {
         private final Set<BlockPos> searchedBlocks = new HashSet<>();
         private final Set<UUID> searchedEntities = new HashSet<>();
+        @Nullable
         private Either<BlockPos, Entity> currentlySearching = null;
         private int currentlySearchingTimeout;
         private boolean hasSearchedEnderChest = false;
@@ -412,6 +414,7 @@ public class FindItemCommand {
         private final Set<BlockPos> searchedBlocks = new HashSet<>();
         private final Set<UUID> searchedEntities = new HashSet<>();
         private boolean isScanning = true;
+        @Nullable
         private Iterator<BlockPos.MutableBlockPos> scanningIterator;
         private final Set<BlockPos> waitingOnBlocks = new HashSet<>();
         private final Set<UUID> waitingOnEntities = new HashSet<>();

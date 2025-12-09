@@ -6,15 +6,15 @@ import com.seedfinding.mcbiome.biome.Biomes;
 import com.seedfinding.mccore.version.MCVersion;
 import com.seedfinding.mcfeature.loot.effect.Effect;
 import com.seedfinding.mcfeature.loot.effect.Effects;
-import net.minecraft.Util;
 import net.minecraft.core.Holder;
 import net.minecraft.core.Registry;
 import net.minecraft.core.RegistryAccess;
 import net.minecraft.core.component.DataComponents;
 import net.minecraft.core.registries.BuiltInRegistries;
 import net.minecraft.core.registries.Registries;
+import net.minecraft.resources.Identifier;
 import net.minecraft.resources.ResourceKey;
-import net.minecraft.resources.ResourceLocation;
+import net.minecraft.util.Util;
 import net.minecraft.world.effect.MobEffect;
 import net.minecraft.world.effect.MobEffects;
 import net.minecraft.world.item.Item;
@@ -25,7 +25,7 @@ import net.minecraft.world.item.enchantment.Enchantment;
 import net.minecraft.world.item.enchantment.Enchantments;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.level.biome.Biome;
-import org.jetbrains.annotations.Nullable;
+import org.jspecify.annotations.Nullable;
 
 import java.util.Objects;
 
@@ -108,9 +108,8 @@ public class SeedfindingUtil {
     private SeedfindingUtil() {
     }
 
-    @Nullable
-    public static com.seedfinding.mcbiome.biome.Biome toSeedfindingBiome(Level level, Holder<Biome> biome) {
-        ResourceLocation name = level.registryAccess().lookupOrThrow(Registries.BIOME).getKey(biome.value());
+    public static com.seedfinding.mcbiome.biome.@Nullable Biome toSeedfindingBiome(Level level, Holder<Biome> biome) {
+        Identifier name = level.registryAccess().lookupOrThrow(Registries.BIOME).getKey(biome.value());
         if (name == null || !"minecraft".equals(name.getNamespace())) {
             return null;
         }
@@ -127,7 +126,7 @@ public class SeedfindingUtil {
     }
 
     public static ItemStack fromSeedfindingItem(com.seedfinding.mcfeature.loot.item.ItemStack stack, RegistryAccess registryAccess) {
-        Item item = BuiltInRegistries.ITEM.getValue(ResourceLocation.withDefaultNamespace(stack.getItem().getName()));
+        Item item = BuiltInRegistries.ITEM.getValue(Identifier.withDefaultNamespace(stack.getItem().getName()));
         if (!stack.getItem().getEnchantments().isEmpty() && item == Items.BOOK) {
             item = Items.ENCHANTED_BOOK;
         }

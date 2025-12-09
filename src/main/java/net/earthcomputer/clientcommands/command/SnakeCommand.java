@@ -12,7 +12,7 @@ import net.minecraft.client.resources.sounds.SimpleSoundInstance;
 import net.minecraft.core.Direction;
 import net.minecraft.network.chat.Component;
 import net.minecraft.network.chat.MutableComponent;
-import net.minecraft.resources.ResourceLocation;
+import net.minecraft.resources.Identifier;
 import net.minecraft.sounds.SoundEvents;
 import org.joml.Vector2i;
 import org.lwjgl.glfw.GLFW;
@@ -45,7 +45,7 @@ class SnakeGameScreen extends Screen {
 
     private static final Minecraft minecraft = Minecraft.getInstance();
 
-    private static final ResourceLocation GRID_TEXTURE = ResourceLocation.fromNamespaceAndPath("clientcommands", "textures/snake_grid.png");
+    private static final Identifier GRID_TEXTURE = Identifier.fromNamespaceAndPath("clientcommands", "textures/snake_grid.png");
 
     private static final Random random = new Random();
 

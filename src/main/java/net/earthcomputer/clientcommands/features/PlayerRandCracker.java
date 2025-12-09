@@ -34,7 +34,7 @@ import net.minecraft.world.item.enchantment.EnchantmentHelper;
 import net.minecraft.world.item.enchantment.Enchantments;
 import net.minecraft.world.item.equipment.Equippable;
 import net.minecraft.world.phys.Vec3;
-import org.jetbrains.annotations.Nullable;
+import org.jspecify.annotations.Nullable;
 
 import java.lang.reflect.Field;
 import java.util.Comparator;
@@ -427,6 +427,7 @@ public class PlayerRandCracker {
         seed = (seed * 0xdba6ed0471f1L + 0x25493d2c3b3cL) & MASK;
     }
 
+    @Nullable
     public static Slot getBestItemThrowSlot(List<Slot> slots) {
         slots = slots.stream().filter(slot -> {
             if (!slot.hasItem()) {
@@ -456,6 +457,7 @@ public class PlayerRandCracker {
         return slots.stream().filter(slot -> slot.getItem().getItem() == preferredItem).findFirst().get();
     }
 
+    @Nullable
     private static final Field RANDOM_SEED;
     static {
         Field randomSeedField;

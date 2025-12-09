@@ -12,12 +12,12 @@ import net.minecraft.client.input.MouseButtonEvent;
 import net.minecraft.client.renderer.RenderPipelines;
 import net.minecraft.client.resources.language.I18n;
 import net.minecraft.network.chat.Component;
-import net.minecraft.resources.ResourceLocation;
+import net.minecraft.resources.Identifier;
 import net.minecraft.sounds.SoundEvents;
 import net.minecraft.sounds.SoundSource;
 import net.minecraft.util.Mth;
-import org.jetbrains.annotations.Nullable;
 import org.joml.Vector2i;
+import org.jspecify.annotations.Nullable;
 
 import java.util.Random;
 
@@ -54,7 +54,7 @@ public class MinesweeperCommand {
     }
 
     private static class MinesweeperGameScreen extends Screen {
-        private static final ResourceLocation MINESWEEPER_ATLAS = ResourceLocation.fromNamespaceAndPath("clientcommands", "textures/minesweeper_atlas.png");
+        private static final Identifier MINESWEEPER_ATLAS = Identifier.fromNamespaceAndPath("clientcommands", "textures/minesweeper_atlas.png");
         private static final int MINESWEEPER_ATLAS_WIDTH = 128;
         private static final int MINESWEEPER_ATLAS_HEIGHT = 64;
 
@@ -226,11 +226,11 @@ public class MinesweeperCommand {
 
                     click(tileX, tileY);
 
-                    assert minecraft != null && minecraft.player != null;
+                    assert minecraft.player != null && minecraft.level != null;
                     if (emptyTilesRemaining <= 0) {
-                        minecraft.player.playNotifySound(SoundEvents.NOTE_BLOCK_PLING.value(), SoundSource.MASTER, 1.0f, 2.0f);
+                        minecraft.level.playSound(minecraft.player, minecraft.player.getX(), minecraft.player.getY(), minecraft.player.getZ(), SoundEvents.NOTE_BLOCK_PLING.value(), SoundSource.MASTER, 1.0f, 2.0f);
                     } else if (deathCoords != null) {
-                        minecraft.player.playNotifySound(SoundEvents.NOTE_BLOCK_BASS.value(), SoundSource.MASTER, 1.0f, 1.0f);
+                        minecraft.level.playSound(minecraft.player, minecraft.player.getX(), minecraft.player.getY(), minecraft.player.getZ(), SoundEvents.NOTE_BLOCK_BASS.value(), SoundSource.MASTER, 1.0f, 1.0f);
                     }
                 } else if (event.button() == InputConstants.MOUSE_BUTTON_RIGHT) {
                     flag(tileX, tileY);

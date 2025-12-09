@@ -26,7 +26,7 @@ public class LevelMixin {
     @Expression("this.random = @(?)")
     @ModifyExpressionValue(method = "<init>", at = @At("MIXINEXTRAS:EXPRESSION"))
     private RandomSource onInitRandom(RandomSource original, @Local(argsOnly = true) ResourceKey<Level> dimension) {
-        if ((Object) this instanceof ServerLevel && dimension.location().equals(DebugRandom.DEBUG_DIMENSION)) {
+        if ((Object) this instanceof ServerLevel && dimension.identifier().equals(DebugRandom.DEBUG_DIMENSION)) {
             return new DebugRandom((Level) (Object) this);
         }
 

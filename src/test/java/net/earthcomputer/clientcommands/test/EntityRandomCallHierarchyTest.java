@@ -51,7 +51,7 @@ public final class EntityRandomCallHierarchyTest {
     @Test
     public void testEnchantmentPlaySoundEffect() {
         TestUtil.regressionTest("enchantmentPlaySoundEffectHierarchy", out -> {
-            CallHierarchyWalker.fromMethod("net/minecraft/world/item/enchantment/effects/PlaySoundEffect", "<init>", "(Lnet/minecraft/core/Holder;Lnet/minecraft/util/valueproviders/FloatProvider;Lnet/minecraft/util/valueproviders/FloatProvider;)V")
+            CallHierarchyWalker.fromMethod("net/minecraft/world/item/enchantment/effects/PlaySoundEffect", "<init>", "(Ljava/util/List;Lnet/minecraft/util/valueproviders/FloatProvider;Lnet/minecraft/util/valueproviders/FloatProvider;)V")
                 .walk((reference, callStack) -> printReference(out, reference, callStack));
         });
     }

@@ -27,7 +27,7 @@ public class Line extends Shape {
 
     public Line toCameraView(Camera camera, DeltaTracker deltaTracker, Vec3 prevPosOffset) {
         float delta = deltaTracker.getRealtimeDeltaTicks();
-        Vec3 cameraPos = camera.getPosition();
+        Vec3 cameraPos = camera.position();
         return new Line(
             start.add(prevPosOffset.scale(1 - delta)).subtract(cameraPos),
             end.add(prevPosOffset.scale(1 - delta).subtract(cameraPos)),

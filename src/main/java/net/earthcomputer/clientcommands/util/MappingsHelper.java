@@ -13,8 +13,8 @@ import net.fabricmc.mappingio.tree.MappingTree;
 import net.fabricmc.mappingio.tree.MemoryMappingTree;
 import net.minecraft.DetectedVersion;
 import net.minecraft.Optionull;
-import net.minecraft.Util;
-import org.jetbrains.annotations.Nullable;
+import net.minecraft.util.Util;
+import org.jspecify.annotations.Nullable;
 import org.slf4j.Logger;
 
 import java.io.BufferedReader;
@@ -65,67 +65,68 @@ public final class MappingsHelper {
             MappingReader.read(reader, MappingFormat.PROGUARD_FILE, tree);
             return CompletableFuture.completedFuture(tree);
         } catch (IOException e) {
-            HttpClient httpClient = HttpClient.newHttpClient();
-            HttpRequest versionsRequest = HttpRequest.newBuilder()
-                .uri(URI.create("https://piston-meta.mojang.com/mc/game/version_manifest_v2.json"))
-                .GET()
-                .timeout(Duration.ofSeconds(5))
-                .build();
-            return httpClient.sendAsync(versionsRequest, HttpResponse.BodyHandlers.ofString())
-                .thenApply(HttpResponse::body)
-                .thenCompose(versionsBody -> {
-                    JsonObject versionsJson = JsonParser.parseString(versionsBody).getAsJsonObject();
-                    String versionUrl = versionsJson.getAsJsonArray("versions").asList().stream()
-                        .map(JsonElement::getAsJsonObject)
-                        .filter(v -> v.get("id").getAsString().equals(version))
-                        .map(v -> v.get("url").getAsString())
-                        .findAny().orElseThrow();
+            try (HttpClient httpClient = HttpClient.newHttpClient()) {
+                HttpRequest versionsRequest = HttpRequest.newBuilder()
+                    .uri(URI.create("https://piston-meta.mojang.com/mc/game/version_manifest_v2.json"))
+                    .GET()
+                    .timeout(Duration.ofSeconds(5))
+                    .build();
+                return httpClient.sendAsync(versionsRequest, HttpResponse.BodyHandlers.ofString())
+                    .thenApply(HttpResponse::body)
+                    .thenCompose(versionsBody -> {
+                        JsonObject versionsJson = JsonParser.parseString(versionsBody).getAsJsonObject();
+                        String versionUrl = versionsJson.getAsJsonArray("versions").asList().stream()
+                            .map(JsonElement::getAsJsonObject)
+                            .filter(v -> v.get("id").getAsString().equals(version))
+                            .map(v -> v.get("url").getAsString())
+                            .findAny().orElseThrow();
 
-                    HttpRequest versionRequest = HttpRequest.newBuilder()
-                        .uri(URI.create(versionUrl))
-                        .GET()
-                        .timeout(Duration.ofSeconds(5))
-                        .build();
-                    return httpClient.sendAsync(versionRequest, HttpResponse.BodyHandlers.ofString());
-                })
-                .whenComplete((result, exception) -> {
-                    if (exception != null) {
-                        ListenCommand.disable();
-                    }
-                })
-                .thenApply(HttpResponse::body)
-                .thenCompose(versionBody -> {
-                    JsonObject versionJson = JsonParser.parseString(versionBody).getAsJsonObject();
-                    String mappingsUrl = versionJson
-                        .getAsJsonObject("downloads")
-                        .getAsJsonObject("client_mappings")
-                        .get("url").getAsString();
-
-                    HttpRequest mappingsRequest = HttpRequest.newBuilder()
-                        .uri(URI.create(mappingsUrl))
-                        .GET()
-                        .timeout(Duration.ofSeconds(5))
-                        .build();
-                    return httpClient.sendAsync(mappingsRequest, HttpResponse.BodyHandlers.ofString());
-                })
-                .thenApply(HttpResponse::body)
-                .thenApply(body -> {
-                    try (StringReader reader = new StringReader(body)) {
-                        MemoryMappingTree tree = new MemoryMappingTree();
-                        MappingReader.read(reader, MappingFormat.PROGUARD_FILE, tree);
-                        return tree;
-                    } catch (IOException ex) {
-                        LOGGER.error("Could not read ProGuard mappings file", ex);
-                        ListenCommand.disable();
-                        throw new UncheckedIOException(ex);
-                    } finally {
-                        try (BufferedWriter writer = Files.newBufferedWriter(MAPPINGS_DIR.resolve(version + ".txt"), StandardOpenOption.CREATE)) {
-                            writer.write(body);
-                        } catch (IOException ex) {
-                            LOGGER.error("Could not write ProGuard mappings file", ex);
+                        HttpRequest versionRequest = HttpRequest.newBuilder()
+                            .uri(URI.create(versionUrl))
+                            .GET()
+                            .timeout(Duration.ofSeconds(5))
+                            .build();
+                        return httpClient.sendAsync(versionRequest, HttpResponse.BodyHandlers.ofString());
+                    })
+                    .whenComplete((result, exception) -> {
+                        if (exception != null) {
+                            ListenCommand.disable();
                         }
-                    }
-                });
+                    })
+                    .thenApply(HttpResponse::body)
+                    .thenCompose(versionBody -> {
+                        JsonObject versionJson = JsonParser.parseString(versionBody).getAsJsonObject();
+                        String mappingsUrl = versionJson
+                            .getAsJsonObject("downloads")
+                            .getAsJsonObject("client_mappings")
+                            .get("url").getAsString();
+
+                        HttpRequest mappingsRequest = HttpRequest.newBuilder()
+                            .uri(URI.create(mappingsUrl))
+                            .GET()
+                            .timeout(Duration.ofSeconds(5))
+                            .build();
+                        return httpClient.sendAsync(mappingsRequest, HttpResponse.BodyHandlers.ofString());
+                    })
+                    .thenApply(HttpResponse::body)
+                    .thenApply(body -> {
+                        try (StringReader reader = new StringReader(body)) {
+                            MemoryMappingTree tree = new MemoryMappingTree();
+                            MappingReader.read(reader, MappingFormat.PROGUARD_FILE, tree);
+                            return tree;
+                        } catch (IOException ex) {
+                            LOGGER.error("Could not read ProGuard mappings file", ex);
+                            ListenCommand.disable();
+                            throw new UncheckedIOException(ex);
+                        } finally {
+                            try (BufferedWriter writer = Files.newBufferedWriter(MAPPINGS_DIR.resolve(version + ".txt"), StandardOpenOption.CREATE)) {
+                                writer.write(body);
+                            } catch (IOException ex) {
+                                LOGGER.error("Could not write ProGuard mappings file", ex);
+                            }
+                        }
+                    });
+            }
         }
     });
     private static final int SRC_OFFICIAL = 0;
@@ -279,6 +280,7 @@ public final class MappingsHelper {
         return intermediaryToMojmap_field(namedOrIntermediaryClass, namedOrIntermediaryField);
     }
 
+    @Nullable
     private static MemoryMappingTree getMojmapOfficial() {
         try {
             return mojmapOfficial.get();
