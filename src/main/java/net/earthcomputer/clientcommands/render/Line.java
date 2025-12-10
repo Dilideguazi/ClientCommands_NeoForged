@@ -57,7 +57,7 @@ public class Line extends Shape {
                 (float) normal.x(),
                 (float) normal.y(),
                 (float) normal.z()
-        );
+        ).setLineWidth(2);
     }
 
     @Override
