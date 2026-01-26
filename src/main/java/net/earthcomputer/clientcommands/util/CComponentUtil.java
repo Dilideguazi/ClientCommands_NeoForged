@@ -257,7 +257,7 @@ public final class CComponentUtil {
                         break;
                     }
                     long now = System.nanoTime();
-                    callbacks.values().removeIf(callback -> now - callback.timeout <= 0);
+                    callbacks.values().removeIf(callback -> now - callback.timeout >= 0);
                 }
             });
         }
