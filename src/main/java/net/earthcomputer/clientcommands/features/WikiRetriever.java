@@ -13,14 +13,18 @@ import java.net.URI;
 import java.net.URL;
 import java.net.URLEncoder;
 import java.nio.charset.StandardCharsets;
+import java.util.Arrays;
+import java.util.List;
 import java.util.Locale;
 import java.util.Map;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
+import java.util.stream.Collectors;
 
 public class WikiRetriever {
 
     private static final String WIKI_HOST = "https://minecraft.wiki/";
+    private static final String SEARCH_QUERY = WIKI_HOST + "api.php?action=query&list=search&srlimit=1&srprop=snippet&format=json&srsearch=%s";
     private static final String PAGE_SUMMARY_QUERY = WIKI_HOST + "api.php?action=query&prop=extracts&exintro=true&format=json&titles=%s";
     private static final Pattern HTML_TAG_PATTERN = Pattern.compile("<\\s*(/)?\\s*(\\w+).*?>|<!--.*?-->|\n", Pattern.DOTALL);
     private static final ChatFormatting CODE_COLOR = ChatFormatting.DARK_GREEN;
@@ -184,19 +188,78 @@ public class WikiRetriever {
     }
 
     @Nullable
-    public static String getWikiSummary(String pageName) {
-        URL url;
-        try {
-            String encodedPage = URLEncoder.encode(pageName, StandardCharsets.UTF_8);
-            url = URI.create(String.format(PAGE_SUMMARY_QUERY, encodedPage)).toURL();
-        } catch (MalformedURLException e) {
-            return null;
-        }
-
+    public static QueryResult getResult(URL url) {
         QueryResult result;
         try (InputStream in = url.openConnection().getInputStream()) {
             result = GSON.fromJson(new InputStreamReader(in), QueryResult.class);
         } catch (IOException e) {
+            return null;
+        }
+        return result;
+    }
+
+    @Nullable
+    public static URL buildURL(String page, String query) {
+        String result = Arrays.stream(page.split("\\s+"))
+                .map(w -> w.substring(0, 1).toUpperCase(Locale.ROOT)
+                        + w.substring(1).toLowerCase(Locale.ROOT))
+                .collect(Collectors.joining(" "));
+
+
+        URL url;
+        try {
+            String encodedPage = URLEncoder.encode(result, StandardCharsets.UTF_8);
+            url = URI.create(String.format(query, encodedPage)).toURL();
+        } catch (MalformedURLException e) {
+            return null;
+        }
+        return url;
+    }
+
+    @Nullable
+    public static String searchArticleName(String pageInput){
+        URL url = buildURL(pageInput.trim(), SEARCH_QUERY);
+        if (url == null) {
+            return null;
+        }
+
+        QueryResult result = getResult(url);
+        if (result == null) {
+            return null;
+        }
+
+        var query = result.query;
+        if (query == null) {
+            return null;
+        }
+
+        var search = query.search;
+        var searchinfo = query.searchinfo;
+        if (search == null || search.isEmpty() || searchinfo == null || searchinfo.totalhits == 0) {
+            return null;
+        }
+
+        if (searchinfo.suggestion != null) {
+            return searchinfo.suggestion;
+        }
+
+        return query.search.getFirst().title;
+    }
+
+    @Nullable
+    public static String getWikiSummary(String pageName) {
+        String title = searchArticleName(pageName);
+        if (title == null) {
+            return null;
+        }
+
+        URL url = buildURL(title, PAGE_SUMMARY_QUERY);
+        if (url == null) {
+            return null;
+        }
+
+        QueryResult result = getResult(url);
+        if (result == null) {
             return null;
         }
 
@@ -212,12 +275,12 @@ public class WikiRetriever {
     }
 
     @SuppressWarnings("unused")
-    private static class QueryResult {
+    public static class QueryResult {
         @Nullable
         public String batchcomplete;
         @Nullable
         public Query query;
-        private static class Query {
+        public static class Query {
             @SuppressWarnings("MismatchedQueryAndUpdateOfCollection")
             @Nullable
             private Map<String, Page> pages;
@@ -229,6 +292,21 @@ public class WikiRetriever {
                 public String extract;
                 @Nullable
                 public String missing;
+            }
+            @SuppressWarnings("MismatchedQueryAndUpdateOfCollection")
+            @Nullable
+            private List<Search> search;
+            private static class Search {
+                @Nullable
+                public String title;
+            }
+            @SuppressWarnings("MismatchedQueryAndUpdateOfCollection")
+            @Nullable
+            private SearchInfo searchinfo;
+            private static class SearchInfo {
+                public int totalhits;
+                @Nullable
+                public String suggestion;
             }
         }
     }
