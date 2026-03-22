@@ -1,5 +1,6 @@
 package net.earthcomputer.clientcommands.features;
 
+import net.earthcomputer.clientcommands.command.ClientCommandHelper;
 import net.earthcomputer.clientcommands.event.ClientConnectionEvents;
 import net.minecraft.ChatFormatting;
 import net.minecraft.client.Minecraft;
@@ -36,7 +37,7 @@ public class ServerBrandManager {
 
     public static void rngWarning() {
         if (!isVanilla() && !hasWarnedRng && !Minecraft.getInstance().hasSingleplayerServer()) {
-            Minecraft.getInstance().gui.getChat().addMessage(
+            ClientCommandHelper.sendFeedback(
                     Component.translatable("playerManip.serverBrandWarning").withStyle(ChatFormatting.YELLOW));
             hasWarnedRng = true;
         }

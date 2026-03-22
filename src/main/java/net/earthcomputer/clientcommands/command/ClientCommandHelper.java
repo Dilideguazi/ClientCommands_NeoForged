@@ -35,7 +35,7 @@ public class ClientCommandHelper {
     }
 
     public static void sendFeedback(Component message) {
-        Minecraft.getInstance().gui.getChat().addMessage(message);
+        Minecraft.getInstance().gui.getChat().addClientSystemMessage(message);
     }
 
     public static void sendRequiresRestart() {

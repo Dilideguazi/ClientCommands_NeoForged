@@ -11,7 +11,7 @@ import net.earthcomputer.clientcommands.command.ClientCommandHelper;
 import net.earthcomputer.clientcommands.features.TwoPlayerGame;
 import net.earthcomputer.clientcommands.render.ColoredTriangleRenderState;
 import net.minecraft.client.Minecraft;
-import net.minecraft.client.gui.GuiGraphics;
+import net.minecraft.client.gui.GuiGraphicsExtractor;
 import net.minecraft.client.gui.components.AbstractButton;
 import net.minecraft.client.gui.components.Button;
 import net.minecraft.client.gui.components.ContainerObjectSelectionList;
@@ -275,25 +275,25 @@ public final class ChessScreen extends Screen {
     }
 
     @Override
-    public void renderBackground(GuiGraphics graphics, int mouseX, int mouseY, float partialTick) {
-        super.renderBackground(graphics, mouseX, mouseY, partialTick);
+    public void extractRenderState(GuiGraphicsExtractor graphics, int mouseX, int mouseY, float a) {
+        super.extractRenderState(graphics, mouseX, mouseY, a);
 
         ChessGame displayingGame = selectedMove + 1 == game.moveList.size() ? game : game.previousGameStates.get(selectedMove + 1);
 
         int startX = (this.width - BOARD_SIZE) / 2;
         int startY = (this.height - BOARD_SIZE) / 2;
 
-        graphics.drawString(this.font, this.title, startX, startY - BOARD_EDGE_PADDING - font.lineHeight, 0xff_ffffff);
+        graphics.text(this.font, this.title, startX, startY - BOARD_EDGE_PADDING - font.lineHeight, 0xff_ffffff);
         graphics.blit(RenderPipelines.GUI_TEXTURED, BOARD_TEXTURE, startX, startY, 0, 0, BOARD_SIZE, BOARD_SIZE, BOARD_SIZE, BOARD_SIZE);
 
         for (int i = 0; i < 8; i++) {
             char rank = game.yourColor == ChessColor.WHITE ? (char) ('8' - i) : (char) ('1' + i);
             char file = game.yourColor == ChessColor.WHITE ? (char) ('a' + i) : (char) ('h' - i);
 
-            graphics.drawCenteredString(this.font, String.valueOf(file), startX + SQUARE_SIZE * i + SQUARE_SIZE / 2, startY - RANK_FILE_LABEL_PADDING - font.lineHeight, 0xff_ffffff);
-            graphics.drawCenteredString(this.font, String.valueOf(file), startX + SQUARE_SIZE * i + SQUARE_SIZE / 2, startY + BOARD_SIZE + RANK_FILE_LABEL_PADDING, 0xff_ffffff);
-            graphics.drawString(this.font, String.valueOf(rank), startX - RANK_FILE_LABEL_PADDING - font.width(String.valueOf(rank)), startY + SQUARE_SIZE * i + SQUARE_SIZE / 2 - font.lineHeight / 2, 0xff_ffffff);
-            graphics.drawString(this.font, String.valueOf(rank), startX + BOARD_SIZE + RANK_FILE_LABEL_PADDING, startY + SQUARE_SIZE * i + SQUARE_SIZE / 2 - font.lineHeight / 2, 0xff_ffffff);
+            graphics.centeredText(this.font, String.valueOf(file), startX + SQUARE_SIZE * i + SQUARE_SIZE / 2, startY - RANK_FILE_LABEL_PADDING - font.lineHeight, 0xff_ffffff);
+            graphics.centeredText(this.font, String.valueOf(file), startX + SQUARE_SIZE * i + SQUARE_SIZE / 2, startY + BOARD_SIZE + RANK_FILE_LABEL_PADDING, 0xff_ffffff);
+            graphics.text(this.font, String.valueOf(rank), startX - RANK_FILE_LABEL_PADDING - font.width(String.valueOf(rank)), startY + SQUARE_SIZE * i + SQUARE_SIZE / 2 - font.lineHeight / 2, 0xff_ffffff);
+            graphics.text(this.font, String.valueOf(rank), startX + BOARD_SIZE + RANK_FILE_LABEL_PADDING, startY + SQUARE_SIZE * i + SQUARE_SIZE / 2 - font.lineHeight / 2, 0xff_ffffff);
         }
 
         Set<Vector2i> regularMoveSquares = new HashSet<>();
@@ -378,7 +378,7 @@ public final class ChessScreen extends Screen {
 
                     Vector2i fromPos = squareToStartScreenPos(animatingMove.from().x, animatingMove.from().y).add(PADDING, PADDING);
                     Vector2i toPos = squareToStartScreenPos(animatingMove.to().x, animatingMove.to().y).add(PADDING, PADDING);
-                    Vector2i pos = interpolateMove(fromPos, toPos, (moveAnimationTicks + partialTick) / MOVE_ANIMATION_LENGTH);
+                    Vector2i pos = interpolateMove(fromPos, toPos, (moveAnimationTicks + a) / MOVE_ANIMATION_LENGTH);
                     graphics.blit(RenderPipelines.GUI_TEXTURED, piece.texture, pos.x, pos.y, piece.u, piece.v, PIECE_SIZE, PIECE_SIZE, PIECE_SIZE, PIECE_SIZE);
                 }
             }
@@ -397,7 +397,7 @@ public final class ChessScreen extends Screen {
                 ChessPiece piece = animatingMove.to().y == 0 ? ChessPiece.WHITE_ROOK : ChessPiece.BLACK_ROOK;
                 Vector2i fromPos = squareToStartScreenPos(rookFromX, animatingMove.from().y).add(PADDING, PADDING);
                 Vector2i toPos = squareToStartScreenPos(rookToX, animatingMove.to().y).add(PADDING, PADDING);
-                Vector2i pos = interpolateMove(fromPos, toPos, (moveAnimationTicks + partialTick) / MOVE_ANIMATION_LENGTH);
+                Vector2i pos = interpolateMove(fromPos, toPos, (moveAnimationTicks + a) / MOVE_ANIMATION_LENGTH);
                 graphics.blit(RenderPipelines.GUI_TEXTURED, piece.texture, pos.x, pos.y, piece.u, piece.v, PIECE_SIZE, PIECE_SIZE, PIECE_SIZE, PIECE_SIZE);
             }
         }
@@ -411,7 +411,7 @@ public final class ChessScreen extends Screen {
             }
         }
 
-        arrows.forEach((arrow, color) -> drawArrow(graphics, arrow, color));
+        arrows.forEach((arrow, color) -> extractArrow(graphics, arrow, color));
 
         if (promotionGuiOrigin != null) {
             int guiOriginX = promotionGuiOrigin.x;
@@ -432,8 +432,8 @@ public final class ChessScreen extends Screen {
             }
 
             for (int i = 0; i < 3; i++) {
-                graphics.hLine(guiOriginX, guiOriginX + 2 * SQUARE_SIZE, guiOriginY + i * SQUARE_SIZE, CommonColors.BLACK);
-                graphics.vLine(guiOriginX + i * SQUARE_SIZE, guiOriginY, guiOriginY + 2 * SQUARE_SIZE, CommonColors.BLACK);
+                graphics.horizontalLine(guiOriginX, guiOriginX + 2 * SQUARE_SIZE, guiOriginY + i * SQUARE_SIZE, CommonColors.BLACK);
+                graphics.verticalLine(guiOriginX + i * SQUARE_SIZE, guiOriginY, guiOriginY + 2 * SQUARE_SIZE, CommonColors.BLACK);
             }
 
             ChessPiece[] promotionPieces = game.yourColor == ChessColor.WHITE ? WHITE_PROMOTION_PIECES : BLACK_PROMOTION_PIECES;
@@ -680,7 +680,7 @@ public final class ChessScreen extends Screen {
         }
     }
 
-    private void drawArrow(GuiGraphics graphics, Arrow arrow, int color) {
+    private void extractArrow(GuiGraphicsExtractor graphics, Arrow arrow, int color) {
         Vector2i fromPos = squareToStartScreenPos(arrow.from.x, arrow.from.y);
         Vector2i toPos = squareToStartScreenPos(arrow.to.x, arrow.to.y);
         if (Math.abs(arrow.to.x - arrow.from.x) + Math.abs(arrow.to.y - arrow.from.y) == 3 && arrow.from.x != arrow.to.x && arrow.from.y != arrow.to.y) {
@@ -706,10 +706,10 @@ public final class ChessScreen extends Screen {
             int dy = arrow.to.y - arrow.from.y;
             if ((dx == 2 && dy == 1) || (dx == 1 && dy == -2) || (dx == -2 && dy == -1) || (dx == -1 && dy == 2)) {
                 graphics.fill(SQUARE_SIZE * 2 - ARROW_HALF_THICKNESS, -SQUARE_SIZE * 3 / 4, SQUARE_SIZE * 2 + ARROW_HALF_THICKNESS, -ARROW_HALF_THICKNESS, color);
-                drawTriangle(graphics, SQUARE_SIZE * 2, -SQUARE_SIZE * 3 / 4 - ARROW_HEAD_SIZE, SQUARE_SIZE * 2 - ARROW_HEAD_SIZE, -SQUARE_SIZE * 3 / 4, SQUARE_SIZE * 2 + ARROW_HEAD_SIZE, -SQUARE_SIZE * 3 / 4, color);
+                extractTriangle(graphics, SQUARE_SIZE * 2, -SQUARE_SIZE * 3 / 4 - ARROW_HEAD_SIZE, SQUARE_SIZE * 2 - ARROW_HEAD_SIZE, -SQUARE_SIZE * 3 / 4, SQUARE_SIZE * 2 + ARROW_HEAD_SIZE, -SQUARE_SIZE * 3 / 4, color);
             } else {
                 graphics.fill(SQUARE_SIZE * 2 - ARROW_HALF_THICKNESS, ARROW_HALF_THICKNESS, SQUARE_SIZE * 2 + ARROW_HALF_THICKNESS, SQUARE_SIZE * 3 / 4, color);
-                drawTriangle(graphics, SQUARE_SIZE * 2 - ARROW_HEAD_SIZE, SQUARE_SIZE * 3 / 4, SQUARE_SIZE * 2, SQUARE_SIZE * 3 / 4 + ARROW_HEAD_SIZE, SQUARE_SIZE * 2 + ARROW_HEAD_SIZE, SQUARE_SIZE * 3 / 4, color);
+                extractTriangle(graphics, SQUARE_SIZE * 2 - ARROW_HEAD_SIZE, SQUARE_SIZE * 3 / 4, SQUARE_SIZE * 2, SQUARE_SIZE * 3 / 4 + ARROW_HEAD_SIZE, SQUARE_SIZE * 2 + ARROW_HEAD_SIZE, SQUARE_SIZE * 3 / 4, color);
             }
             graphics.pose().popMatrix();
         } else {
@@ -718,13 +718,13 @@ public final class ChessScreen extends Screen {
             graphics.pose().rotate((float) Math.atan2(toPos.y - fromPos.y, toPos.x - fromPos.x));
             int arrowLength = (int) Math.hypot(toPos.x - fromPos.x, toPos.y - fromPos.y) - SQUARE_SIZE / 4;
             graphics.fill(SQUARE_SIZE / 4, -ARROW_HALF_THICKNESS, arrowLength, ARROW_HALF_THICKNESS, color);
-            drawTriangle(graphics, arrowLength, -ARROW_HEAD_SIZE, arrowLength, ARROW_HEAD_SIZE, arrowLength + ARROW_HEAD_SIZE, 0, color);
+            extractTriangle(graphics, arrowLength, -ARROW_HEAD_SIZE, arrowLength, ARROW_HEAD_SIZE, arrowLength + ARROW_HEAD_SIZE, 0, color);
             graphics.pose().popMatrix();
         }
     }
 
-    private static void drawTriangle(GuiGraphics graphics, int x0, int y0, int x1, int y1, int x2, int y2, int color) {
-        graphics.guiRenderState.submitGuiElement(new ColoredTriangleRenderState(RenderPipelines.GUI, TextureSetup.noTexture(), new Matrix3x2f(graphics.pose()), x0, y0, x1, y1, x2, y2, color, graphics.scissorStack.peek()));
+    private static void extractTriangle(GuiGraphicsExtractor graphics, int x0, int y0, int x1, int y1, int x2, int y2, int color) {
+        graphics.guiRenderState.addGuiElement(new ColoredTriangleRenderState(RenderPipelines.GUI, TextureSetup.noTexture(), new Matrix3x2f(graphics.pose()), x0, y0, x1, y1, x2, y2, color, graphics.scissorStack.peek()));
     }
 
     private static Vector2i interpolateMove(Vector2i from, Vector2i to, float t) {
@@ -766,11 +766,11 @@ public final class ChessScreen extends Screen {
         }
 
         @Override
-        protected void renderListBackground(GuiGraphics guiGraphics) {
+        protected void extractListBackground(GuiGraphicsExtractor graphics) {
         }
 
         @Override
-        protected void renderListSeparators(GuiGraphics guiGraphics) {
+        protected void extractListSeparators(GuiGraphicsExtractor graphics) {
         }
 
         @Override
@@ -833,15 +833,15 @@ public final class ChessScreen extends Screen {
             }
 
             @Override
-            public void renderContent(GuiGraphics guiGraphics, int mouseX, int mouseY, boolean isHovering, float partialTick) {
+            public void extractContent(GuiGraphicsExtractor graphics, int mouseX, int mouseY, boolean hovered, float a) {
                 whiteMove.setX(getContentX());
                 whiteMove.setY(getContentY());
-                whiteMove.render(guiGraphics, mouseX, mouseY, partialTick);
+                whiteMove.extractRenderState(graphics, mouseX, mouseY, a);
 
                 if (blackMove != null) {
                     blackMove.setX(getContentX() + getContentWidth() / 2);
                     blackMove.setY(getContentY());
-                    blackMove.render(guiGraphics, mouseX, mouseY, partialTick);
+                    blackMove.extractRenderState(graphics, mouseX, mouseY, a);
                 }
             }
 
@@ -864,13 +864,13 @@ public final class ChessScreen extends Screen {
             }
 
             @Override
-            protected void renderContents(GuiGraphics graphics, int mouseX, int mouseY, float partialTick) {
-                this.renderDefaultLabel(graphics.textRendererForWidget(this, GuiGraphics.HoveredTextEffects.NONE));
+            protected void extractContents(GuiGraphicsExtractor graphics, int mouseX, int mouseY, float a) {
+                extractDefaultLabel(graphics.textRendererForWidget(this, GuiGraphicsExtractor.HoveredTextEffects.NONE));
                 if (selectedMove == moveNumber) {
-                    graphics.hLine(getX(), getRight() - 1, getY(), CommonColors.WHITE);
-                    graphics.hLine(getX(), getRight() - 1, getBottom() - 1, CommonColors.WHITE);
-                    graphics.vLine(getX(), getY(), getBottom() - 1, CommonColors.WHITE);
-                    graphics.vLine(getRight() - 1, getY(), getBottom() - 1, CommonColors.WHITE);
+                    graphics.horizontalLine(getX(), getRight() - 1, getY(), CommonColors.WHITE);
+                    graphics.horizontalLine(getX(), getRight() - 1, getBottom() - 1, CommonColors.WHITE);
+                    graphics.verticalLine(getX(), getY(), getBottom() - 1, CommonColors.WHITE);
+                    graphics.verticalLine(getRight() - 1, getY(), getBottom() - 1, CommonColors.WHITE);
                 }
             }
         }

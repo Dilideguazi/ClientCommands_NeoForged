@@ -28,7 +28,7 @@ import static dev.xpple.clientarguments.arguments.CColorArgument.*;
 import static dev.xpple.clientarguments.arguments.CEntityArgument.*;
 import static net.earthcomputer.clientcommands.command.ClientCommandHelper.*;
 import static net.earthcomputer.clientcommands.command.arguments.MultibaseIntegerArgument.*;
-import static net.fabricmc.fabric.api.client.command.v2.ClientCommandManager.*;
+import static net.fabricmc.fabric.api.client.command.v2.ClientCommands.*;
 
 public class GlowCommand {
     private static final SimpleCommandExceptionType FAILED_EXCEPTION = new SimpleCommandExceptionType(Component.translatable("commands.cglow.entity.failed"));
@@ -123,7 +123,7 @@ public class GlowCommand {
         List<AABB> boundingBoxes = new ArrayList<>();
 
         if (pos2 == null) {
-            boundingBoxes.addAll(Minecraft.getInstance().level.getBlockState(pos1).getShape(source.getWorld(), pos1).toAabbs());
+            boundingBoxes.addAll(Minecraft.getInstance().level.getBlockState(pos1).getShape(source.getLevel(), pos1).toAabbs());
             if (boundingBoxes.isEmpty()) {
                 boundingBoxes.add(new AABB(pos1));
             } else {

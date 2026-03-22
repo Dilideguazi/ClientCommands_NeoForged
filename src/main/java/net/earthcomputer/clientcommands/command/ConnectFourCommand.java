@@ -10,7 +10,7 @@ import net.earthcomputer.clientcommands.features.TwoPlayerGame;
 import net.fabricmc.fabric.api.client.command.v2.FabricClientCommandSource;
 import net.minecraft.ChatFormatting;
 import net.minecraft.client.Minecraft;
-import net.minecraft.client.gui.GuiGraphics;
+import net.minecraft.client.gui.GuiGraphicsExtractor;
 import net.minecraft.client.gui.screens.Screen;
 import net.minecraft.client.input.MouseButtonEvent;
 import net.minecraft.client.multiplayer.ClientPacketListener;
@@ -225,7 +225,7 @@ public class ConnectFourCommand {
             };
         }
 
-        public void render(GuiGraphics graphics, int x, int y, boolean transparent) {
+        public void extractRenderState(GuiGraphicsExtractor graphics, int x, int y, boolean transparent) {
             int xOffset = switch (this) {
                 case RED -> 0;
                 case YELLOW -> 16;
@@ -292,15 +292,15 @@ public class ConnectFourCommand {
         }
 
         @Override
-        public void renderBackground(GuiGraphics graphics, int mouseX, int mouseY, float partialTick) {
-            super.renderBackground(graphics, mouseX, mouseY, partialTick);
+        public void extractRenderState(GuiGraphicsExtractor graphics, int mouseX, int mouseY, float a) {
+            super.extractRenderState(graphics, mouseX, mouseY, a);
             int startX = (this.width - BOARD_WIDTH) / 2;
             int startY = (this.height - BOARD_HEIGHT) / 2;
             Component gameStateTranslate = getGameStateTranslate();
 
-            graphics.drawString(this.font, Component.translatable("connectFourGame.pieceSet", this.game.yourPiece.translate()), startX, startY - 20, 0xff_ffffff);
-            graphics.drawString(this.font, this.title, startX, startY - 10, 0xff_ffffff);
-            graphics.drawString(this.font, gameStateTranslate, startX + BOARD_WIDTH - this.font.width(gameStateTranslate), startY - 10, 0xff_ffffff);
+            graphics.text(this.font, Component.translatable("connectFourGame.pieceSet", this.game.yourPiece.translate()), startX, startY - 20, 0xff_ffffff);
+            graphics.text(this.font, this.title, startX, startY - 10, 0xff_ffffff);
+            graphics.text(this.font, gameStateTranslate, startX + BOARD_WIDTH - this.font.width(gameStateTranslate), startY - 10, 0xff_ffffff);
 
             graphics.blit(
                 RenderPipelines.GUI_TEXTURED,
@@ -321,7 +321,7 @@ public class ConnectFourCommand {
                 for (int y = 0; y < ConnectFourGame.HEIGHT; y++) {
                     Piece piece = this.game.board[x][y];
                     if (piece != null) {
-                        piece.render(graphics, startX + BOARD_BORDER_WIDTH + SLOT_WIDTH * x + SLOT_BORDER_WIDTH, startY + BOARD_BORDER_HEIGHT + SLOT_HEIGHT * (ConnectFourGame.HEIGHT - 1 - y) + SLOT_BORDER_HEIGHT, false);
+                        piece.extractRenderState(graphics, startX + BOARD_BORDER_WIDTH + SLOT_WIDTH * x + SLOT_BORDER_WIDTH, startY + BOARD_BORDER_HEIGHT + SLOT_HEIGHT * (ConnectFourGame.HEIGHT - 1 - y) + SLOT_BORDER_HEIGHT, false);
                     }
                 }
             }
@@ -333,7 +333,7 @@ public class ConnectFourCommand {
                 int x = (mouseX - boardMinX) / SLOT_WIDTH;
                 int y = this.game.getPlacementY(x);
                 if (y < ConnectFourGame.HEIGHT) {
-                    game.yourPiece.render(graphics, startX + BOARD_BORDER_WIDTH + SLOT_WIDTH * x + SLOT_BORDER_WIDTH, startY + BOARD_BORDER_HEIGHT + SLOT_HEIGHT * (ConnectFourGame.HEIGHT - 1 - y) + SLOT_BORDER_HEIGHT, true);
+                    game.yourPiece.extractRenderState(graphics, startX + BOARD_BORDER_WIDTH + SLOT_WIDTH * x + SLOT_BORDER_WIDTH, startY + BOARD_BORDER_HEIGHT + SLOT_HEIGHT * (ConnectFourGame.HEIGHT - 1 - y) + SLOT_BORDER_HEIGHT, true);
                 }
             }
         }

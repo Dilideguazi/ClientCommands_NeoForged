@@ -7,7 +7,7 @@ import net.minecraft.client.gui.components.DebugScreenOverlay;
 import net.minecraft.util.StringRepresentable;
 
 import static dev.xpple.clientarguments.arguments.CEnumArgument.*;
-import static net.fabricmc.fabric.api.client.command.v2.ClientCommandManager.*;
+import static net.fabricmc.fabric.api.client.command.v2.ClientCommands.*;
 
 public class CDebugCommand {
     public static void register(CommandDispatcher<FabricClientCommandSource> dispatcher) {

@@ -15,7 +15,7 @@ import java.util.stream.Collectors;
 
 import static dev.xpple.clientarguments.arguments.CEnumArgument.*;
 import static dev.xpple.clientarguments.arguments.CGameProfileArgument.*;
-import static net.fabricmc.fabric.api.client.command.v2.ClientCommandManager.*;
+import static net.fabricmc.fabric.api.client.command.v2.ClientCommands.*;
 
 public class CGameModeCommand {
 

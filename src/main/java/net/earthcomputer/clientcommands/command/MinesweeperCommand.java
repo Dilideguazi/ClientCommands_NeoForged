@@ -6,7 +6,7 @@ import com.mojang.brigadier.CommandDispatcher;
 import com.mojang.brigadier.exceptions.CommandSyntaxException;
 import com.mojang.brigadier.exceptions.SimpleCommandExceptionType;
 import net.fabricmc.fabric.api.client.command.v2.FabricClientCommandSource;
-import net.minecraft.client.gui.GuiGraphics;
+import net.minecraft.client.gui.GuiGraphicsExtractor;
 import net.minecraft.client.gui.screens.Screen;
 import net.minecraft.client.input.MouseButtonEvent;
 import net.minecraft.client.renderer.RenderPipelines;
@@ -22,7 +22,7 @@ import org.jspecify.annotations.Nullable;
 import java.util.Random;
 
 import static com.mojang.brigadier.arguments.IntegerArgumentType.*;
-import static net.fabricmc.fabric.api.client.command.v2.ClientCommandManager.*;
+import static net.fabricmc.fabric.api.client.command.v2.ClientCommands.*;
 
 public class MinesweeperCommand {
     private static final SimpleCommandExceptionType TOO_MANY_MINES_EXCEPTION = new SimpleCommandExceptionType(Component.translatable("commands.cminesweeper.tooManyMines"));
@@ -162,9 +162,11 @@ public class MinesweeperCommand {
         }
 
         @Override
-        public void render(GuiGraphics graphics, int mouseX, int mouseY, float tickDelta) {
-            graphics.drawString(minecraft.font, I18n.get("minesweeperGame.minesLeft", minesLeft), topLeftX, topLeftY - 10, 0xFFFFFFFF);
-            graphics.drawCenteredString(minecraft.font, title.getString(), topLeftX + gameWidth / 2, topLeftY - 20, 0xFFFFFFFF);
+        public void extractRenderState(GuiGraphicsExtractor graphics, int mouseX, int mouseY, float a) {
+            super.extractRenderState(graphics, mouseX, mouseY, a);
+
+            graphics.text(minecraft.font, I18n.get("minesweeperGame.minesLeft", minesLeft), topLeftX, topLeftY - 10, 0xFFFFFFFF);
+            graphics.centeredText(minecraft.font, title.getString(), topLeftX + gameWidth / 2, topLeftY - 20, 0xFFFFFFFF);
             {
                 String str = I18n.get("minesweeperGame.timePlayed", Math.ceilDiv(ticksPlaying, 20));
                 int color;
@@ -175,7 +177,7 @@ public class MinesweeperCommand {
                 } else {
                     color = 0xFFFFFF;
                 }
-                graphics.drawString(minecraft.font, str, topLeftX + gameWidth - minecraft.font.width(str), topLeftY - 10, color);
+                graphics.text(minecraft.font, str, topLeftX + gameWidth - minecraft.font.width(str), topLeftY - 10, color);
             }
 
             blitSprite(graphics, TOP_LEFT_UV, 0, 0, 12, 12);
@@ -201,7 +203,7 @@ public class MinesweeperCommand {
             }
         }
 
-        public void blitSprite(GuiGraphics graphics, Vector2i uv, int x, int y, int width, int height) {
+        public void blitSprite(GuiGraphicsExtractor graphics, Vector2i uv, int x, int y, int width, int height) {
             graphics.blit(RenderPipelines.GUI_TEXTURED, MINESWEEPER_ATLAS, topLeftX + x, topLeftY + y, uv.x, uv.y, width, height, MINESWEEPER_ATLAS_WIDTH, MINESWEEPER_ATLAS_HEIGHT);
         }
 

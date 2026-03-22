@@ -1,4 +1,4 @@
-accessWidener v2 named
+accessWidener v2 official
 
 # c2c
 accessible field net/minecraft/client/multiplayer/AccountProfileKeyPairManager keyPair Ljava/util/concurrent/CompletableFuture;
@@ -20,19 +20,18 @@ accessible field net/minecraft/commands/arguments/coordinates/LocalCoordinates u
 accessible field net/minecraft/commands/arguments/coordinates/WorldCoordinates x Lnet/minecraft/commands/arguments/coordinates/WorldCoordinate;
 accessible field net/minecraft/commands/arguments/coordinates/WorldCoordinates y Lnet/minecraft/commands/arguments/coordinates/WorldCoordinate;
 accessible field net/minecraft/commands/arguments/coordinates/WorldCoordinates z Lnet/minecraft/commands/arguments/coordinates/WorldCoordinate;
-accessible field net/minecraft/network/chat/contents/NbtContents compiledNbtPath Lnet/minecraft/commands/arguments/NbtPathArgument$NbtPath;
 
 # cfinditem
 accessible field net/minecraft/world/inventory/AbstractContainerMenu menuType Lnet/minecraft/world/inventory/MenuType;
 accessible method net/minecraft/world/level/block/ShulkerBoxBlock canOpen (Lnet/minecraft/world/level/block/state/BlockState;Lnet/minecraft/world/level/Level;Lnet/minecraft/core/BlockPos;Lnet/minecraft/world/level/block/entity/ShulkerBoxBlockEntity;)Z
 
 # cfish
+accessible field net/minecraft/world/entity/item/ItemEntity DATA_ITEM Lnet/minecraft/network/syncher/EntityDataAccessor;
 accessible method net/minecraft/world/entity/projectile/FishingHook canHitEntity (Lnet/minecraft/world/entity/Entity;)Z
 
 # cfps
-accessible field net/minecraft/client/Minecraft virtualScreen Lnet/minecraft/client/renderer/VirtualScreen;
-accessible field net/minecraft/client/renderer/VirtualScreen screenManager Lcom/mojang/blaze3d/platform/ScreenManager;
 accessible field com/mojang/blaze3d/platform/ScreenManager monitors Lit/unimi/dsi/fastutil/longs/Long2ObjectMap;
+accessible field com/mojang/blaze3d/platform/Window screenManager Lcom/mojang/blaze3d/platform/ScreenManager;
 
 # cgive
 accessible method net/minecraft/world/entity/player/Inventory addResource (ILnet/minecraft/world/item/ItemStack;)I

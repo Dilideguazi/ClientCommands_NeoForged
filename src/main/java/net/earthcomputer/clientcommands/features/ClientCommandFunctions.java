@@ -10,7 +10,6 @@ import com.mojang.logging.LogUtils;
 import net.earthcomputer.clientcommands.ClientCommands;
 import net.earthcomputer.clientcommands.Configs;
 import net.earthcomputer.clientcommands.command.VarCommand;
-import net.fabricmc.fabric.api.client.command.v2.ClientCommandManager;
 import net.fabricmc.fabric.api.client.command.v2.FabricClientCommandSource;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.multiplayer.ServerData;
@@ -26,7 +25,6 @@ import java.io.BufferedWriter;
 import java.io.File;
 import java.io.IOException;
 import java.nio.file.Files;
-import java.nio.file.InvalidPathException;
 import java.nio.file.Path;
 import java.util.ArrayDeque;
 import java.util.Collections;
@@ -36,6 +34,8 @@ import java.util.List;
 import java.util.Map;
 import java.util.function.IntConsumer;
 import java.util.stream.Stream;
+
+import static net.fabricmc.fabric.api.client.command.v2.ClientCommands.*;
 
 public class ClientCommandFunctions {
     private static final Logger LOGGER = LogUtils.getLogger();
@@ -122,7 +122,7 @@ public class ClientCommandFunctions {
         LOGGER.info("Running startup function {}", startupFunction);
 
         try {
-            var dispatcher = ClientCommandManager.getActiveDispatcher();
+            var dispatcher = getActiveDispatcher();
             assert dispatcher != null : "Command dispatcher should not be null while calling ClientCommandFunctions.runStartup()";
             var packetListener = Minecraft.getInstance().getConnection();
             assert packetListener != null : "Network handler should not be null while calling ClientCommandFunctions.runStartup()";
@@ -200,16 +200,14 @@ public class ClientCommandFunctions {
                 }
                 function = function.replace("/", File.separator);
             }
-            Path path;
-            try {
-                path = FUNCTION_DIR.resolve(function + ".mcfunction");
-            } catch (InvalidPathException e) {
+            List<String> decomposedPath = FileUtil.decomposePath(function + ".mcfunction").result().orElse(null);
+            if (decomposedPath == null) {
                 return null;
             }
-            if (!FileUtil.isPathNormalized(path) || !FileUtil.isPathPortable(path)) {
+            if (!decomposedPath.stream().allMatch(FileUtil::isPathPartPortable)) {
                 return null;
             }
-            return path;
+            return FileUtil.resolvePath(FUNCTION_DIR, decomposedPath);
         }
 
         static CommandFunction load(CommandDispatcher<FabricClientCommandSource> dispatcher, FabricClientCommandSource source, String function) throws CommandSyntaxException {

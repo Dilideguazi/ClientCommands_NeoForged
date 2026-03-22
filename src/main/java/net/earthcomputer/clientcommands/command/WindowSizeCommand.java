@@ -8,7 +8,7 @@ import net.fabricmc.fabric.api.client.command.v2.FabricClientCommandSource;
 import org.lwjgl.glfw.GLFW;
 
 import static com.mojang.brigadier.arguments.IntegerArgumentType.*;
-import static net.fabricmc.fabric.api.client.command.v2.ClientCommandManager.*;
+import static net.fabricmc.fabric.api.client.command.v2.ClientCommands.*;
 
 public class WindowSizeCommand {
     public static void register(CommandDispatcher<FabricClientCommandSource> dispatcher) {

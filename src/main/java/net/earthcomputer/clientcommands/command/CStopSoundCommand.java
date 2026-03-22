@@ -10,7 +10,7 @@ import net.minecraft.resources.Identifier;
 import net.minecraft.sounds.SoundSource;
 
 import static dev.xpple.clientarguments.arguments.CIdentifierArgument.*;
-import static net.fabricmc.fabric.api.client.command.v2.ClientCommandManager.*;
+import static net.fabricmc.fabric.api.client.command.v2.ClientCommands.*;
 
 public class CStopSoundCommand {
 

@@ -20,7 +20,7 @@ import net.earthcomputer.clientcommands.util.MultiVersionCompat;
 import net.minecraft.ChatFormatting;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.Font;
-import net.minecraft.client.gui.GuiGraphics;
+import net.minecraft.client.gui.GuiGraphicsExtractor;
 import net.minecraft.client.gui.components.ChatComponent;
 import net.minecraft.client.multiplayer.ClientLevel;
 import net.minecraft.client.player.LocalPlayer;
@@ -134,7 +134,7 @@ public class EnchantmentCracker {
      * This section is in charge of rendering the overlay on the enchantment GUI
      */
 
-    public static void drawEnchantmentGUIOverlay(GuiGraphics graphics) {
+    public static void extractEnchantmentGUIOverlay(GuiGraphicsExtractor graphics) {
         ClientLevel level = Minecraft.getInstance().level;
         assert level != null;
 
@@ -194,7 +194,7 @@ public class EnchantmentCracker {
         Font font = Minecraft.getInstance().font;
         int y = 0;
         for (Component line : lines) {
-            graphics.drawString(font, line, 0, y, 0xffffffff, false);
+            graphics.text(font, line, 0, y, 0xffffffff, false);
             y += font.lineHeight;
         }
     }
@@ -560,7 +560,7 @@ public class EnchantmentCracker {
                         taskList.addTask(new LongTask() {
                             @Override
                             public void initialize() {
-                                Minecraft.getInstance().gui.getChat().addMessage(Component.translatable("enchCrack.insn.dummy"));
+                                ClientCommandHelper.sendFeedback("enchCrack.insn.dummy");
                             }
 
                             @Override
@@ -589,9 +589,9 @@ public class EnchantmentCracker {
                         public void run() {
                             if (Configs.enchCrackState == CrackState.CRACKED) {
                                 ChatComponent chat = Minecraft.getInstance().gui.getChat();
-                                chat.addMessage(Component.translatable("enchCrack.insn.ready").withStyle(ChatFormatting.BOLD));
-                                chat.addMessage(Component.translatable("enchCrack.insn.bookshelves", finalResult.bookshelves));
-                                chat.addMessage(Component.translatable("enchCrack.insn.slot", finalResult.slot + 1));
+                                ClientCommandHelper.sendFeedback(Component.translatable("enchCrack.insn.ready").withStyle(ChatFormatting.BOLD));
+                                ClientCommandHelper.sendFeedback("enchCrack.insn.bookshelves", finalResult.bookshelves);
+                                ClientCommandHelper.sendFeedback("enchCrack.insn.slot", finalResult.slot + 1);
                                 expectedNumBookshelves = finalResult.bookshelves;
                             }
                         }

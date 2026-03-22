@@ -18,7 +18,6 @@ import net.earthcomputer.clientcommands.features.Relogger;
 import net.earthcomputer.clientcommands.features.ServerBrandManager;
 import net.earthcomputer.clientcommands.features.Waypoints;
 import net.earthcomputer.clientcommands.render.RenderQueue;
-import net.earthcomputer.clientcommands.util.MappingsHelper;
 import net.fabricmc.api.ClientModInitializer;
 import net.fabricmc.fabric.api.client.command.v2.ClientCommandRegistrationCallback;
 import net.fabricmc.fabric.api.client.command.v2.FabricClientCommandSource;
@@ -75,10 +74,8 @@ public class ClientCommands implements ClientModInitializer {
         Waypoints.migrateWaypoints();
         SimpleWaypointsAPI.getInstance().registerCommandAlias("cwaypoint");
 
-        MappingsHelper.load();
-
         // Registration
-        PayloadTypeRegistry.playC2S().register(CommandExecutionCustomPayload.TYPE, CommandExecutionCustomPayload.CODEC);
+        PayloadTypeRegistry.serverboundPlay().register(CommandExecutionCustomPayload.TYPE, CommandExecutionCustomPayload.CODEC);
         CreativeTabCommand.registerCreativeTabs();
 
         // Events

@@ -123,7 +123,7 @@ public class CCrackRng {
             Component message = Component.translatable("commands.ccrackrng.starting")
                 .append(" ")
                 .append(CComponentUtil.getCommandTextComponent("commands.client.cancel", "/ctask stop " + currentTaskName));
-            Minecraft.getInstance().gui.getChat().addMessage(message);
+            ClientCommandHelper.sendFeedback(message);
         }
     }
 

@@ -22,7 +22,7 @@ import net.minecraft.network.chat.MutableComponent;
 import net.minecraft.sounds.SoundEvents;
 import net.minecraft.util.StringRepresentable;
 import net.minecraft.world.entity.LivingEntity;
-import net.minecraft.world.inventory.ClickType;
+import net.minecraft.world.inventory.ContainerInput;
 import net.minecraft.world.inventory.Slot;
 import net.minecraft.world.item.Item;
 import net.minecraft.world.item.ItemStack;
@@ -417,8 +417,8 @@ public class PlayerRandCracker {
         if (matchingSlot == null) {
             return new ThrowItemsResult(ThrowItemsResult.Type.NOT_ENOUGH_ITEMS);
         }
-        interactionManager.handleInventoryMouseClick(player.containerMenu.containerId,
-                matchingSlot.index, 0, ClickType.THROW, player);
+        interactionManager.handleContainerInput(player.containerMenu.containerId,
+                matchingSlot.index, 0, ContainerInput.THROW, player);
 
         return new ThrowItemsResult(ThrowItemsResult.Type.SUCCESS);
     }

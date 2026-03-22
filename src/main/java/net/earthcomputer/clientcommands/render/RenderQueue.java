@@ -1,19 +1,21 @@
 package net.earthcomputer.clientcommands.render;
 
+import com.mojang.blaze3d.pipeline.DepthStencilState;
 import com.mojang.blaze3d.pipeline.RenderPipeline;
-import com.mojang.blaze3d.platform.DepthTestFunction;
+import com.mojang.blaze3d.platform.CompareOp;
 import com.mojang.blaze3d.vertex.PoseStack;
 import com.mojang.blaze3d.vertex.VertexConsumer;
-import net.earthcomputer.clientcommands.event.MoreWorldRenderEvents;
 import net.fabricmc.fabric.api.client.event.lifecycle.v1.ClientTickEvents;
 import net.fabricmc.fabric.api.client.rendering.v1.RenderStateDataKey;
+import net.fabricmc.fabric.api.client.rendering.v1.level.LevelRenderEvents;
 import net.minecraft.client.Minecraft;
+import net.minecraft.client.renderer.MultiBufferSource;
 import net.minecraft.client.renderer.RenderPipelines;
 import net.minecraft.client.renderer.rendertype.LayeringTransform;
 import net.minecraft.client.renderer.rendertype.OutputTarget;
 import net.minecraft.client.renderer.rendertype.RenderSetup;
 import net.minecraft.client.renderer.rendertype.RenderType;
-import net.minecraft.client.renderer.state.LevelRenderState;
+import net.minecraft.client.renderer.state.level.LevelRenderState;
 import net.minecraft.resources.Identifier;
 import net.minecraft.world.phys.AABB;
 import net.minecraft.world.phys.Vec3;
@@ -36,7 +38,7 @@ public class RenderQueue {
     private static final RenderPipeline LINES_NO_DEPTH_PIPELINE = RenderPipelines.register(
         RenderPipeline.builder(RenderPipelines.LINES_SNIPPET)
             .withLocation(Identifier.fromNamespaceAndPath("clientcommands", "pipeline/lines_no_depth"))
-            .withDepthTestFunction(DepthTestFunction.NO_DEPTH_TEST)
+            .withDepthStencilState(new DepthStencilState(CompareOp.ALWAYS_PASS, true))
             .build()
     );
     public static final RenderType LINES_NO_DEPTH_LAYER = RenderType.create(
@@ -50,18 +52,19 @@ public class RenderQueue {
     static {
         ClientTickEvents.START_CLIENT_TICK.register(RenderQueue::tick);
 
-        MoreWorldRenderEvents.EXTRACT_STATE.register((state, camera, deltaTracker) -> {
+        LevelRenderEvents.END_EXTRACTION.register(context -> {
             EnumMap<Layer, List<Line>> lines = new EnumMap<>(Layer.class);
             queue.forEach((layer, shapes) -> {
                 List<Line> linesToRender = new ArrayList<>();
-                shapes.values().forEach(shape -> shape.addLines(linesToRender::add, camera, deltaTracker));
+                shapes.values().forEach(shape -> shape.addLines(linesToRender::add, context.camera(), context.deltaTracker()));
                 lines.put(layer, linesToRender);
             });
-            state.setData(LINES_KEY, lines);
+            context.levelState().setData(LINES_KEY, lines);
         });
 
-        MoreWorldRenderEvents.END_MAIN_PASS.register((bufferSource, poseStack, state) -> {
-            render(Layer.ON_TOP, bufferSource.getBuffer(LINES_NO_DEPTH_LAYER), poseStack, state);
+        LevelRenderEvents.END_MAIN.register(context -> {
+            render(Layer.ON_TOP, context.bufferSource().getBuffer(LINES_NO_DEPTH_LAYER), context.poseStack(), context.levelState());
+            ((MultiBufferSource.BufferSource) context.bufferSource()).endBatch();
         });
     }
 

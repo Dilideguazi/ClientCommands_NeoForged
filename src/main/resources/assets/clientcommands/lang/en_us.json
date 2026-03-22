@@ -165,6 +165,7 @@
   "commands.cfps.setMaxFps.unlimited": "Set max FPS to unlimited",
 
   "commands.cfunction.limitReached": "Command limit (%s) reached",
+  "commands.cfunction.noActiveDispatcher": "No active command dispatcher",
   "commands.cfunction.success": "Ran %s commands from function %s",
 
   "commands.cgamemode.listWithGameMode": "The following players are in game mode %s:",

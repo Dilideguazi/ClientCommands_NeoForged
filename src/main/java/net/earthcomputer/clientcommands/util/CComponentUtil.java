@@ -13,7 +13,6 @@ import net.minecraft.commands.arguments.coordinates.Coordinates;
 import net.minecraft.commands.arguments.coordinates.LocalCoordinates;
 import net.minecraft.commands.arguments.coordinates.WorldCoordinates;
 import net.minecraft.commands.arguments.selector.EntitySelector;
-import net.minecraft.commands.arguments.selector.SelectorPattern;
 import net.minecraft.core.BlockPos;
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.nbt.NbtOps;
@@ -34,6 +33,7 @@ import net.minecraft.network.chat.contents.data.BlockDataSource;
 import net.minecraft.network.chat.contents.data.DataSource;
 import net.minecraft.network.chat.contents.data.EntityDataSource;
 import net.minecraft.resources.RegistryOps;
+import net.minecraft.util.CompilableString;
 import net.minecraft.util.Mth;
 import net.minecraft.world.entity.Entity;
 import net.minecraft.world.level.block.entity.BlockEntity;
@@ -134,19 +134,15 @@ public final class CComponentUtil {
     ) throws CommandSyntaxException {
         return switch (contents) {
             case NbtContents nbt -> {
-                if (nbt.compiledNbtPath == null) {
-                    yield Component.empty();
-                }
-
-                Stream<Tag> tags = getData(source, nbt.getDataSource()).flatMap(tag -> {
+                Stream<Tag> tags = getData(source, nbt.dataSource()).flatMap(tag -> {
                     try {
-                        return nbt.compiledNbtPath.get(tag).stream();
+                        return nbt.nbtPath().compiled().get(tag).stream();
                     } catch (CommandSyntaxException var3) {
                         return Stream.empty();
                     }
                 });
-                Component separator = nbt.getSeparator().isPresent() ? updateForEntity(source, nbt.getSeparator().get(), entity, recursionDepth) : ComponentUtils.DEFAULT_NO_STYLE_SEPARATOR;
-                if (nbt.isInterpreting()) {
+                Component separator = nbt.separator().isPresent() ? updateForEntity(source, nbt.separator().get(), entity, recursionDepth) : ComponentUtils.DEFAULT_NO_STYLE_SEPARATOR;
+                if (nbt.interpreting()) {
                     RegistryOps<Tag> ops = source.registryAccess().createSerializationContext(NbtOps.INSTANCE);
                     yield tags.flatMap(tag -> {
                         try {
@@ -164,11 +160,11 @@ public final class CComponentUtil {
                         .orElseGet(Component::empty);
                 }
             }
-            case SelectorContents(SelectorPattern(String pattern, EntitySelector ignored), Optional<Component> separator) -> {
+            case SelectorContents(CompilableString<EntitySelector> selectorStr, Optional<Component> separator) -> {
                 if (separator.isPresent()) {
                     separator = Optional.of(updateForEntity(source, separator.get(), entity, recursionDepth));
                 }
-                CEntitySelector selector = new CEntitySelectorParser(new StringReader(pattern), true).parse();
+                CEntitySelector selector = new CEntitySelectorParser(new StringReader(selectorStr.source()), true).parse();
                 yield ComponentUtils.formatList(selector.findEntities(source), separator, Entity::getDisplayName);
             }
             case TranslatableContents translatable -> {
@@ -206,16 +202,13 @@ public final class CComponentUtil {
 
     private static Stream<CompoundTag> getData(FabricClientCommandSource source, DataSource data) throws CommandSyntaxException {
         return switch (data) {
-            case BlockDataSource(String ignored, Coordinates compiledPos) -> {
-                if (compiledPos == null) {
-                    yield Stream.empty();
-                }
-                BlockPos pos = getBlockPos(source, compiledPos);
-                BlockEntity be = source.getWorld().getBlockEntity(pos);
+            case BlockDataSource(Coordinates coordinates) -> {
+                BlockPos pos = getBlockPos(source, coordinates);
+                BlockEntity be = source.getLevel().getBlockEntity(pos);
                 yield be == null ? Stream.empty() : Stream.of(be.saveWithFullMetadata(source.registryAccess()));
             }
-            case EntityDataSource(String selectorPattern, EntitySelector ignored) -> {
-                CEntitySelector selector = new CEntitySelectorParser(new StringReader(selectorPattern), true).parse();
+            case EntityDataSource(CompilableString<EntitySelector> selectorStr) -> {
+                CEntitySelector selector = new CEntitySelectorParser(new StringReader(selectorStr.source()), true).parse();
                 yield selector.findEntities(source).stream().map(NbtPredicate::getEntityTagToCompare);
             }
             default -> Stream.empty();

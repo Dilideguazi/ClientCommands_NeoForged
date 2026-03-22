@@ -12,7 +12,6 @@ import io.netty.handler.codec.EncoderException;
 import it.unimi.dsi.fastutil.ints.IntList;
 import net.earthcomputer.clientcommands.c2c.C2CPacketHandler;
 import net.earthcomputer.clientcommands.c2c.C2CPacketListener;
-import net.earthcomputer.clientcommands.util.MappingsHelper;
 import net.minecraft.client.Minecraft;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.GlobalPos;
@@ -27,7 +26,6 @@ import net.minecraft.resources.Identifier;
 import net.minecraft.resources.ResourceKey;
 import net.minecraft.world.level.ChunkPos;
 import net.minecraft.world.phys.BlockHitResult;
-import net.minecraft.world.phys.Vec3;
 import org.apache.commons.io.function.IOBiConsumer;
 import org.apache.commons.io.function.IORunnable;
 import org.apache.commons.io.function.IOStream;
@@ -167,9 +165,8 @@ public class PacketDumper {
         public <E extends Enum<E>> void writeEnumSet(EnumSet<E> enumSet, Class<E> enumClass) {
             dump("enumSet", () -> {
                 String className = enumClass.getName().replace('.', '/');
-                String mojmapClassName = Objects.requireNonNullElse(MappingsHelper.namedOrIntermediaryToMojmap_class(className), className);
-                mojmapClassName = mojmapClassName.substring(mojmapClassName.lastIndexOf('/') + 1);
-                writer.name("enumClass").value(mojmapClassName);
+                className = className.substring(className.lastIndexOf('/') + 1);
+                writer.name("enumClass").value(className);
                 writer.name("size").value(enumSet.size());
                 writer.name("elements").beginArray();
                 for (final E element : enumSet) {
@@ -246,8 +243,8 @@ public class PacketDumper {
         @Override
         public PacketDumpByteBuf writeChunkPos(ChunkPos chunkPos) {
             return dump("chunkPos", () -> writer
-                .name("x").value(chunkPos.x)
-                .name("z").value(chunkPos.z)
+                .name("x").value(chunkPos.x())
+                .name("z").value(chunkPos.z())
             );
         }
 
@@ -281,22 +278,12 @@ public class PacketDumper {
         }
 
         @Override
-        public void writeVec3(Vec3 vec3) {
-            dump("vec3", () -> writer
-                .name("x").value(vec3.x)
-                .name("y").value(vec3.y)
-                .name("z").value(vec3.z)
-            );
-        }
-
-        @Override
         public PacketDumpByteBuf writeEnum(Enum<?> value) {
             return dump("enum", () -> {
                 String className = value.getDeclaringClass().getName().replace('.', '/');
-                String mojmapClassName = Objects.requireNonNullElse(MappingsHelper.namedOrIntermediaryToMojmap_class(className), className);
-                mojmapClassName = mojmapClassName.substring(mojmapClassName.lastIndexOf('/') + 1);
+                className = className.substring(className.lastIndexOf('/') + 1);
                 writer
-                    .name("enum").value(mojmapClassName)
+                    .name("enum").value(className)
                     .name("value").value(value.name());
             });
         }
@@ -575,9 +562,8 @@ public class PacketDumper {
             writer.name("valueClass");
             if (value != null) {
                 String className = value.getClass().getName().replace('.', '/');
-                String mojmapClassName = Objects.requireNonNullElse(MappingsHelper.namedOrIntermediaryToMojmap_class(className), className);
-                mojmapClassName = mojmapClassName.substring(mojmapClassName.lastIndexOf('/') + 1);
-                writer.value(mojmapClassName);
+                className = className.substring(className.lastIndexOf('/') + 1);
+                writer.value(className);
             } else {
                 writer.nullValue();
             }

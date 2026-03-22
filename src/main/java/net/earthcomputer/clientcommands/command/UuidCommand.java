@@ -12,7 +12,7 @@ import net.minecraft.network.chat.HoverEvent;
 import java.util.UUID;
 
 import static net.earthcomputer.clientcommands.command.arguments.EntityUUIDArgument.*;
-import static net.fabricmc.fabric.api.client.command.v2.ClientCommandManager.*;
+import static net.fabricmc.fabric.api.client.command.v2.ClientCommands.*;
 
 public class UuidCommand {
 

@@ -23,7 +23,7 @@ import net.earthcomputer.clientcommands.command.TicTacToeCommand;
 import net.earthcomputer.clientcommands.command.arguments.ExtendedMarkdownArgument;
 import net.earthcomputer.clientcommands.features.TwoPlayerGame;
 import net.earthcomputer.clientcommands.util.CComponentUtil;
-import net.fabricmc.fabric.api.networking.v1.PacketByteBufs;
+import net.fabricmc.fabric.api.networking.v1.FriendlyByteBufs;
 import net.minecraft.ChatFormatting;
 import net.minecraft.SharedConstants;
 import net.minecraft.client.Minecraft;
@@ -90,7 +90,7 @@ public class C2CPacketHandler implements C2CPacketListener {
             throw PUBLIC_KEY_NOT_FOUND_EXCEPTION.create();
         }
         PublicKey key = ppk.data().key();
-        FriendlyByteBuf buf = wrapByteBuf(PacketByteBufs.create(), null, null);
+        FriendlyByteBuf buf = wrapByteBuf(FriendlyByteBufs.create(), null, null);
         if (buf == null) {
             return;
         }
@@ -193,7 +193,7 @@ public class C2CPacketHandler implements C2CPacketListener {
         try {
             packet.handle(C2CPacketHandler.getInstance());
         } catch (Throwable e) {
-            Minecraft.getInstance().gui.getChat().addMessage(Component.nullToEmpty(e.getMessage()));
+            Minecraft.getInstance().gui.getChat().addClientSystemMessage(Component.nullToEmpty(e.getMessage()));
             LOGGER.error("Error handling C2C packet", e);
         }
         return true;
@@ -215,7 +215,7 @@ public class C2CPacketHandler implements C2CPacketListener {
         prefix.append(Component.literal("]").withStyle(ChatFormatting.DARK_GRAY));
         prefix.append(Component.literal(" "));
         Component component = prefix.append(Component.translatable("c2cpacket.messageC2CPacket.incoming", sender, formattedComponent));
-        Minecraft.getInstance().gui.getChat().addMessage(component);
+        Minecraft.getInstance().gui.getChat().addClientSystemMessage(component);
     }
 
     @Override

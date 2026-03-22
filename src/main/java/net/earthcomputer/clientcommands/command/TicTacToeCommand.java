@@ -8,7 +8,7 @@ import net.earthcomputer.clientcommands.c2c.packets.PutTicTacToeMarkC2CPacket;
 import net.earthcomputer.clientcommands.features.TwoPlayerGame;
 import net.fabricmc.fabric.api.client.command.v2.FabricClientCommandSource;
 import net.minecraft.client.Minecraft;
-import net.minecraft.client.gui.GuiGraphics;
+import net.minecraft.client.gui.GuiGraphicsExtractor;
 import net.minecraft.client.gui.screens.Screen;
 import net.minecraft.client.input.MouseButtonEvent;
 import net.minecraft.client.multiplayer.PlayerInfo;
@@ -139,15 +139,15 @@ public class TicTacToeCommand {
         }
 
         @Override
-        public void renderBackground(GuiGraphics guiGraphics, int mouseX, int mouseY, float partialTick) {
-            super.renderBackground(guiGraphics, mouseX, mouseY, partialTick);
+        public void extractRenderState(GuiGraphicsExtractor graphics, int mouseX, int mouseY, float a) {
+            super.extractRenderState(graphics, mouseX, mouseY, a);
             int startX = (this.width - GRID_SIZE) / 2;
             int startY = (this.height - GRID_SIZE) / 2;
 
-            guiGraphics.drawString(this.font, this.title, startX, startY - 20, 0xff_ffffff);
-            guiGraphics.drawString(this.font, Component.translatable("ticTacToeGame.playingWith", this.game.yourMarks.name), startX, startY - 10, 0xff_ffffff);
+            graphics.text(this.font, this.title, startX, startY - 20, 0xff_ffffff);
+            graphics.text(this.font, Component.translatable("ticTacToeGame.playingWith", this.game.yourMarks.name), startX, startY - 10, 0xff_ffffff);
 
-            guiGraphics.blit(RenderPipelines.GUI_TEXTURED, GRID_TEXTURE, startX, startY, 0, 0, GRID_SIZE, GRID_SIZE, GRID_SIZE_TEXTURE, GRID_SIZE_TEXTURE, GRID_SIZE_TEXTURE, GRID_SIZE_TEXTURE);
+            graphics.blit(RenderPipelines.GUI_TEXTURED, GRID_TEXTURE, startX, startY, 0, 0, GRID_SIZE, GRID_SIZE, GRID_SIZE_TEXTURE, GRID_SIZE_TEXTURE, GRID_SIZE_TEXTURE, GRID_SIZE_TEXTURE);
             TicTacToeGame.@Nullable Mark[][] board = this.game.board;
 
             for (byte x = 0; x < 3; x++) {
@@ -160,7 +160,7 @@ public class TicTacToeCommand {
                         case NOUGHT -> 0;
                         case CROSS -> MARK_SIZE_TEXTURE;
                     };
-                    guiGraphics.blit(RenderPipelines.GUI_TEXTURED, MARKS_TEXTURE, startX + (CELL_SIZE + BORDER_SIZE) * x + PADDING, startY + (CELL_SIZE + BORDER_SIZE) * y + PADDING, offset, 0, MARK_SIZE, MARK_SIZE, MARK_SIZE_TEXTURE, MARK_SIZE_TEXTURE, 2 * MARK_SIZE_TEXTURE, MARK_SIZE_TEXTURE);
+                    graphics.blit(RenderPipelines.GUI_TEXTURED, MARKS_TEXTURE, startX + (CELL_SIZE + BORDER_SIZE) * x + PADDING, startY + (CELL_SIZE + BORDER_SIZE) * y + PADDING, offset, 0, MARK_SIZE, MARK_SIZE, MARK_SIZE_TEXTURE, MARK_SIZE_TEXTURE, 2 * MARK_SIZE_TEXTURE, MARK_SIZE_TEXTURE);
                 }
             }
         }

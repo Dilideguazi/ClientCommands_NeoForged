@@ -12,8 +12,6 @@ import org.spongepowered.asm.mixin.injection.At;
 import org.spongepowered.asm.mixin.injection.Inject;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 
-import java.util.function.Predicate;
-
 @Mixin(EditBox.class)
 public abstract class EditBoxMixin implements IEditBox {
     @Shadow
@@ -27,7 +25,6 @@ public abstract class EditBoxMixin implements IEditBox {
 
     @Shadow public abstract String getValue();
 
-    @Shadow private Predicate<String> filter;
     @Unique
     @Nullable
     private Integer oldMaxLength = null;
@@ -44,9 +41,6 @@ public abstract class EditBoxMixin implements IEditBox {
         int startSelection = Math.min(cursorPos, highlightPos);
         int endSelection = Math.max(cursorPos, highlightPos);
         String newText = new StringBuilder(getValue()).replace(startSelection, endSelection, StringUtil.filterText(textToWrite)).toString();
-        if (!this.filter.test(newText)) {
-            return;
-        }
 
         updateTextMaxLength(newText);
     }

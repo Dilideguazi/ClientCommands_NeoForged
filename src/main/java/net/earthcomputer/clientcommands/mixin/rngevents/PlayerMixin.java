@@ -95,7 +95,7 @@ public abstract class PlayerMixin extends LivingEntity {
                     PlayerRandCracker.onItemDamage(weaponComponent.itemDamagePerAttack(), this, heldStack);
                 }
 
-                if (target.getType().is(EntityTypeTags.SENSITIVE_TO_BANE_OF_ARTHROPODS)) {
+                if (target.is(EntityTypeTags.SENSITIVE_TO_BANE_OF_ARTHROPODS)) {
                     registryAccess().lookupOrThrow(Registries.ENCHANTMENT).get(Enchantments.BANE_OF_ARTHROPODS).ifPresent(baneOfArthropods -> {
                         if (EnchantmentHelper.getItemEnchantmentLevel(baneOfArthropods, heldStack) > 0) {
                             PlayerRandCracker.onBaneOfArthropods();
@@ -120,7 +120,7 @@ public abstract class PlayerMixin extends LivingEntity {
         }
 
         BlocksAttacks blocksAttacksComponent = blockingWith.get(DataComponents.BLOCKS_ATTACKS);
-        if (blocksAttacksComponent == null || blocksAttacksComponent.bypassedBy().map(source::is).orElse(false)) {
+        if (blocksAttacksComponent == null || blocksAttacksComponent.bypassedBy().map(bypassedBy -> bypassedBy.contains(source.typeHolder())).orElse(false)) {
             return 0;
         }
 

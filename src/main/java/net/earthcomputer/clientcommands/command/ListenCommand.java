@@ -10,7 +10,6 @@ import com.mojang.logging.LogUtils;
 import it.unimi.dsi.fastutil.objects.ReferenceOpenHashSet;
 import net.earthcomputer.clientcommands.Configs;
 import net.earthcomputer.clientcommands.features.PacketDumper;
-import net.earthcomputer.clientcommands.util.MappingsHelper;
 import net.earthcomputer.clientcommands.util.ReflectionUtils;
 import net.earthcomputer.clientcommands.util.UnsafeUtils;
 import net.fabricmc.fabric.api.client.command.v2.FabricClientCommandSource;
@@ -41,13 +40,12 @@ import java.util.Collection;
 import java.util.Date;
 import java.util.HashSet;
 import java.util.Map;
-import java.util.Objects;
 import java.util.Optional;
 import java.util.Set;
 import java.util.UUID;
 
 import static net.earthcomputer.clientcommands.command.arguments.PacketTypeArgument.*;
-import static net.fabricmc.fabric.api.client.command.v2.ClientCommandManager.*;
+import static net.fabricmc.fabric.api.client.command.v2.ClientCommands.*;
 
 public class ListenCommand {
 
@@ -114,10 +112,9 @@ public class ListenCommand {
                 }
 
                 String packetClassName = packet.getClass().getName().replace('.', '/');
-                String mojmapPacketName = Objects.requireNonNullElse(MappingsHelper.namedOrIntermediaryToMojmap_class(packetClassName), packetClassName);
-                mojmapPacketName = mojmapPacketName.substring(mojmapPacketName.lastIndexOf('/') + 1);
+                packetClassName = packetClassName.substring(packetClassName.lastIndexOf('/') + 1);
 
-                MutableComponent packetComponent = Component.literal(mojmapPacketName).withStyle(s -> s
+                MutableComponent packetComponent = Component.literal(packetClassName).withStyle(s -> s
                     .withUnderlined(true)
                     .withHoverEvent(new HoverEvent.ShowText(packetDataPreview))
                     .withClickEvent(new ClickEvent.CopyToClipboard(packetData)));
@@ -235,28 +232,26 @@ public class ListenCommand {
                 }
 
                 String className = object.getClass().getName().replace(".", "/");
-                String mojmapClassName = Objects.requireNonNullElse(MappingsHelper.namedOrIntermediaryToMojmap_class(className), className);
-                mojmapClassName = mojmapClassName.substring(mojmapClassName.lastIndexOf('/') + 1);
+                className = className.substring(className.lastIndexOf('/') + 1);
 
-                MutableComponent component = Component.literal(mojmapClassName + '{');
+                MutableComponent component = Component.literal(className + '{');
                 component.append(ReflectionUtils.getAllFields(object.getClass())
                     .filter(field -> !Modifier.isStatic(field.getModifiers()))
                     .map(field -> {
                         String fieldName = field.getName();
-                        String mojmapFieldName = Objects.requireNonNullElse(MappingsHelper.namedOrIntermediaryToMojmap_field(className, fieldName), fieldName);
                         try {
                             field.setAccessible(true);
-                            return Component.literal(mojmapFieldName + '=').append(serialize(field.get(object), seen, depth + 1));
+                            return Component.literal(fieldName + '=').append(serialize(field.get(object), seen, depth + 1));
                         } catch (InaccessibleObjectException | ReflectiveOperationException e) {
                             try {
                                 MethodHandles.Lookup implLookup = UnsafeUtils.getImplLookup();
                                 if (implLookup == null) {
-                                    return Component.literal(mojmapFieldName + '=').append(Component.translatable("commands.clisten.packetError").withStyle(ChatFormatting.DARK_RED));
+                                    return Component.literal(fieldName + '=').append(Component.translatable("commands.clisten.packetError").withStyle(ChatFormatting.DARK_RED));
                                 }
                                 VarHandle varHandle = implLookup.findVarHandle(object.getClass(), fieldName, field.getType());
-                                return Component.literal(mojmapFieldName + '=').append(serialize(varHandle.get(object), seen, depth + 1));
+                                return Component.literal(fieldName + '=').append(serialize(varHandle.get(object), seen, depth + 1));
                             } catch (ReflectiveOperationException ex) {
-                                return Component.literal(mojmapFieldName + '=').append(Component.translatable("commands.clisten.packetError").withStyle(ChatFormatting.DARK_RED));
+                                return Component.literal(fieldName + '=').append(Component.translatable("commands.clisten.packetError").withStyle(ChatFormatting.DARK_RED));
                             }
                         }
                     })
