@@ -9,7 +9,6 @@ import net.fabricmc.fabric.api.client.event.lifecycle.v1.ClientTickEvents;
 import net.fabricmc.fabric.api.client.rendering.v1.RenderStateDataKey;
 import net.fabricmc.fabric.api.client.rendering.v1.level.LevelRenderEvents;
 import net.minecraft.client.Minecraft;
-import net.minecraft.client.renderer.MultiBufferSource;
 import net.minecraft.client.renderer.RenderPipelines;
 import net.minecraft.client.renderer.rendertype.LayeringTransform;
 import net.minecraft.client.renderer.rendertype.OutputTarget;
@@ -64,7 +63,7 @@ public class RenderQueue {
 
         LevelRenderEvents.END_MAIN.register(context -> {
             render(Layer.ON_TOP, context.bufferSource().getBuffer(LINES_NO_DEPTH_LAYER), context.poseStack(), context.levelState());
-            ((MultiBufferSource.BufferSource) context.bufferSource()).endBatch();
+            context.bufferSource().endBatch();
         });
     }
 
