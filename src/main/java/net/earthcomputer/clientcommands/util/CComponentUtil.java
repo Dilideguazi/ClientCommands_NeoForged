@@ -218,7 +218,7 @@ public final class CComponentUtil {
     private static BlockPos getBlockPos(FabricClientCommandSource source, Coordinates pos) {
         Vec3 sourcePos = source.getPosition();
         return switch (pos) {
-            case WorldCoordinates worldCoords -> BlockPos.containing(worldCoords.x.get(sourcePos.x), worldCoords.y.get(sourcePos.y), worldCoords.z.get(sourcePos.z));
+            case WorldCoordinates worldCoords -> BlockPos.containing(worldCoords.x().get(sourcePos.x), worldCoords.y().get(sourcePos.y), worldCoords.z().get(sourcePos.z));
             case LocalCoordinates localCoords -> {
                 Vec2 rotation = source.getRotation();
                 float yawX = Mth.cos((rotation.y + 90) * Mth.DEG_TO_RAD);
@@ -230,9 +230,9 @@ public final class CComponentUtil {
                 Vec3 forwardsVec = new Vec3(yawX * forwardsHPitch, forwardsVPitch, yawZ * forwardsHPitch);
                 Vec3 upVec = new Vec3(yawX * upHPitch, upVPitch, yawZ * upHPitch);
                 Vec3 leftVec = forwardsVec.cross(upVec).scale(-1.0);
-                double dx = forwardsVec.x * localCoords.forwards + upVec.x * localCoords.up + leftVec.x * localCoords.left;
-                double dy = forwardsVec.y * localCoords.forwards + upVec.y * localCoords.up + leftVec.y * localCoords.left;
-                double dz = forwardsVec.z * localCoords.forwards + upVec.z * localCoords.up + leftVec.z * localCoords.left;
+                double dx = forwardsVec.x * localCoords.forwards() + upVec.x * localCoords.up() + leftVec.x * localCoords.left();
+                double dy = forwardsVec.y * localCoords.forwards() + upVec.y * localCoords.up() + leftVec.y * localCoords.left();
+                double dz = forwardsVec.z * localCoords.forwards() + upVec.z * localCoords.up() + leftVec.z * localCoords.left();
                 yield BlockPos.containing(sourcePos.x + dx, sourcePos.y + dy, sourcePos.z + dz);
             }
             default -> BlockPos.ZERO;

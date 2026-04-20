@@ -13,14 +13,6 @@ accessible field net/minecraft/client/gui/components/CommandSuggestions ARGUMENT
 # Data Query Handler
 accessible field net/minecraft/client/DebugQueryHandler transactionId I
 
-# CComponentUtil
-accessible field net/minecraft/commands/arguments/coordinates/LocalCoordinates forwards D
-accessible field net/minecraft/commands/arguments/coordinates/LocalCoordinates left D
-accessible field net/minecraft/commands/arguments/coordinates/LocalCoordinates up D
-accessible field net/minecraft/commands/arguments/coordinates/WorldCoordinates x Lnet/minecraft/commands/arguments/coordinates/WorldCoordinate;
-accessible field net/minecraft/commands/arguments/coordinates/WorldCoordinates y Lnet/minecraft/commands/arguments/coordinates/WorldCoordinate;
-accessible field net/minecraft/commands/arguments/coordinates/WorldCoordinates z Lnet/minecraft/commands/arguments/coordinates/WorldCoordinate;
-
 # cfinditem
 accessible field net/minecraft/world/inventory/AbstractContainerMenu menuType Lnet/minecraft/world/inventory/MenuType;
 accessible method net/minecraft/world/level/block/ShulkerBoxBlock canOpen (Lnet/minecraft/world/level/block/state/BlockState;Lnet/minecraft/world/level/Level;Lnet/minecraft/core/BlockPos;Lnet/minecraft/world/level/block/entity/ShulkerBoxBlockEntity;)Z
