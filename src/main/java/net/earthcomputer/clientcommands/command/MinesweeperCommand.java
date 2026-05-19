@@ -5,6 +5,7 @@ import com.mojang.brigadier.Command;
 import com.mojang.brigadier.CommandDispatcher;
 import com.mojang.brigadier.exceptions.CommandSyntaxException;
 import com.mojang.brigadier.exceptions.SimpleCommandExceptionType;
+import it.unimi.dsi.fastutil.ints.IntArrayList;
 import net.fabricmc.fabric.api.client.command.v2.FabricClientCommandSource;
 import net.minecraft.client.gui.GuiGraphicsExtractor;
 import net.minecraft.client.gui.screens.Screen;
@@ -20,6 +21,7 @@ import org.joml.Vector2i;
 import org.jspecify.annotations.Nullable;
 
 import java.util.Random;
+import java.util.stream.Stream;
 
 import static com.mojang.brigadier.arguments.IntegerArgumentType.*;
 import static net.fabricmc.fabric.api.client.command.v2.ClientCommands.*;
@@ -83,7 +85,7 @@ public class MinesweeperCommand {
         private static final Vector2i SIX_TILE_UV = new Vector2i(36, 16);
         private static final Vector2i SEVEN_TILE_UV = new Vector2i(52, 16);
         private static final Vector2i EIGHT_TILE_UV = new Vector2i(68, 16);
-        private static final Vector2i[] WARNING_TILE_UV = new Vector2i[] {
+        private static final Vector2i[] WARNING_TILE_UV = new Vector2i[]{
             ONE_TILE_UV,
             TWO_TILE_UV,
             THREE_TILE_UV,
@@ -198,7 +200,7 @@ public class MinesweeperCommand {
             for (int x = 0; x < boardWidth; x++) {
                 for (int y = 0; y < boardHeight; y++) {
                     boolean hovered = Mth.floorDiv(mouseX - topLeftX - 12, 16) == x && Mth.floorDiv(mouseY - topLeftY - 12, 16) == y;
-                    blitSprite(graphics, getTileSprite(x, y, hovered),  x * 16 + 12, y * 16 + 12, 16, 16);
+                    blitSprite(graphics, getTileSprite(x, y, hovered), x * 16 + 12, y * 16 + 12, 16, 16);
                 }
             }
         }
@@ -221,12 +223,17 @@ public class MinesweeperCommand {
 
             if (isWithinBounds(tileX, tileY) && gameActive()) {
                 if (event.button() == InputConstants.MOUSE_BUTTON_LEFT) {
+                    byte tile = getTile(tileX, tileY);
                     if (ticksPlaying == 0) {
                         generateMines(tileX, tileY);
                         ticksPlaying = 1;
                     }
 
-                    click(tileX, tileY);
+                    if (isCovered(tile)) {
+                        click(tileX, tileY);
+                    } else {
+                        click3x3(tileX, tileY);
+                    }
 
                     assert minecraft.player != null && minecraft.level != null;
                     if (emptyTilesRemaining <= 0) {
@@ -291,6 +298,14 @@ public class MinesweeperCommand {
             return 0 <= x && x < boardWidth && 0 <= y && y < boardHeight;
         }
 
+        private Stream<Vector2i> getNeighbors(int x, int y) {
+            return Stream.of(
+                new Vector2i(x - 1, y - 1), new Vector2i(x, y - 1), new Vector2i(x + 1, y - 1),
+                new Vector2i(x - 1, y), new Vector2i(x + 1, y),
+                new Vector2i(x - 1, y + 1), new Vector2i(x, y + 1), new Vector2i(x + 1, y + 1)
+            ).filter(pos -> isWithinBounds(pos.x, pos.y));
+        }
+
         private void click(int x, int y) {
             byte tile = getTile(x, y);
             if (!isCovered(tile) || isFlagged(tile)) {
@@ -308,39 +323,29 @@ public class MinesweeperCommand {
                 uncover(x, y);
                 emptyTilesRemaining--;
                 // we need to leave room for the current tile in the queue
-                int[] queue = new int[emptyTilesRemaining + 1];
-                int queueIdx = 0;
-                queue[0] = y * boardWidth + x;
-                while (queueIdx >= 0) {
-                    int idx = queue[queueIdx--];
+                IntArrayList queue = new IntArrayList(emptyTilesRemaining + 1);
+                queue.add(y * boardWidth + x);
+                while (!queue.isEmpty()) {
+                    int idx = queue.popInt();
                     int xPart = idx % boardWidth;
                     int yPart = idx / boardWidth;
-                    for (Vector2i possibleNeighbour : new Vector2i[]{
-                        new Vector2i(xPart - 1, yPart - 1),
-                        new Vector2i(xPart, yPart - 1),
-                        new Vector2i(xPart + 1, yPart - 1),
-
-                        new Vector2i(xPart - 1, yPart),
-                        new Vector2i(xPart + 1, yPart),
-
-                        new Vector2i(xPart - 1, yPart + 1),
-                        new Vector2i(xPart, yPart + 1),
-                        new Vector2i(xPart + 1, yPart + 1),
-                    }) {
-                        if (isWithinBounds(possibleNeighbour.x, possibleNeighbour.y)) {
-                            byte value = getTile(possibleNeighbour.x, possibleNeighbour.y);
-                            uncover(possibleNeighbour.x, possibleNeighbour.y);
-                            if (isCovered(value)) {
-                                emptyTilesRemaining--;
-                                // if it's an empty tile, we put it in the queue to go activate all its neighbours
-                                if (tileType(value) == EMPTY_TILE_TYPE) {
-                                    queue[++queueIdx] = possibleNeighbour.y * boardWidth + possibleNeighbour.x;
-                                }
+                    getNeighbors(xPart, yPart).forEach(neighbor -> {
+                        byte value = getTile(neighbor.x, neighbor.y);
+                        uncover(neighbor.x, neighbor.y);
+                        if (isCovered(value)) {
+                            emptyTilesRemaining--;
+                            // if it's an empty tile, we put it in the queue to go activate all its neighbors
+                            if (tileType(value) == EMPTY_TILE_TYPE) {
+                                queue.add(neighbor.y * boardWidth + neighbor.x);
                             }
                         }
-                    }
+                    });
                 }
             }
+        }
+
+        private void click3x3(int x, int y) {
+            getNeighbors(x, y).forEach(neighbor -> click(neighbor.x, neighbor.y));
         }
 
         private void flag(int x, int y) {
