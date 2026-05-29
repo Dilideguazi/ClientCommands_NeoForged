@@ -64,6 +64,8 @@ dependencies {
 	includedLibrary "com.seedfinding:latticg:${project.latticg_version}:rt"
 	codeGenImplementation "com.seedfinding:latticg:${project.latticg_version}"
 
+	codeGenImplementation "org.jspecify:jspecify:1.0.0"
+
 	compileOnly 'com.demonwav.mcdev:annotations:2.0.0'
 
 	runtimeOnly("me.djtheredstoner:DevAuth-fabric:${project.devauth_version}") {

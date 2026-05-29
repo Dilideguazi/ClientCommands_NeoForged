@@ -5,6 +5,8 @@
     <property name="fileExtensions" value="java"/>
     <module name="NewlineAtEndOfFile"/>
 
+    <module name="JavadocPackage"/>
+
     <module name="TreeWalker">
         <module name="SuppressionCommentFilter"/>
 
