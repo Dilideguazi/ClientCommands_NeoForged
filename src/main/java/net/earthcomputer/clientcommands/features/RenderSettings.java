@@ -7,8 +7,8 @@ import net.fabricmc.fabric.api.client.command.v2.FabricClientCommandSource;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.multiplayer.ClientSuggestionProvider;
 import net.minecraft.server.permissions.PermissionSet;
-import net.minecraft.util.Tuple;
 import net.minecraft.world.entity.Entity;
+import org.apache.commons.lang3.tuple.Pair;
 
 import java.util.ArrayList;
 import java.util.HashSet;
@@ -17,7 +17,7 @@ import java.util.Set;
 import java.util.UUID;
 
 public class RenderSettings {
-    private static final List<Tuple<CEntitySelector, Boolean>> entityRenderSelectors = new ArrayList<>();
+    private static final List<Pair<CEntitySelector, Boolean>> entityRenderSelectors = new ArrayList<>();
     private static final Set<UUID> disabledEntities = new HashSet<>();
 
     static {
@@ -36,7 +36,7 @@ public class RenderSettings {
         if (entityRenderSelectors.size() == 16) {
             entityRenderSelectors.removeFirst();
         }
-        entityRenderSelectors.add(new Tuple<>(selector, shouldRender));
+        entityRenderSelectors.add(Pair.of(selector, shouldRender));
     }
 
     public static void preRenderEntities() {
@@ -50,8 +50,8 @@ public class RenderSettings {
         disabledEntities.clear();
         for (var filter : entityRenderSelectors) {
             try {
-                List<UUID> entities = filter.getA().findEntities(source).stream().map(Entity::getUUID).toList();
-                if (filter.getB()) {
+                List<UUID> entities = filter.getLeft().findEntities(source).stream().map(Entity::getUUID).toList();
+                if (filter.getRight()) {
                     entities.forEach(disabledEntities::remove);
                 } else {
                     disabledEntities.addAll(entities);

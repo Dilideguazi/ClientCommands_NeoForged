@@ -72,8 +72,8 @@ public class FramerateCommand {
     }
 
     private static int getDisplayMaxFramerate() {
-        return Minecraft.getInstance().getWindow().screenManager.monitors.values().stream()
-            .mapToInt(monitor -> monitor.getCurrentMode().getRefreshRate())
+        return Minecraft.getInstance().getWindow().monitorManager.monitors.values().stream()
+            .mapToInt(monitor -> monitor.currentMode().getRefreshRate())
             .max().orElseThrow();
     }
 }

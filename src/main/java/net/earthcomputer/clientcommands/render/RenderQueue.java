@@ -4,17 +4,20 @@ import com.mojang.blaze3d.pipeline.DepthStencilState;
 import com.mojang.blaze3d.pipeline.RenderPipeline;
 import com.mojang.blaze3d.platform.CompareOp;
 import com.mojang.blaze3d.vertex.PoseStack;
-import com.mojang.blaze3d.vertex.VertexConsumer;
 import net.fabricmc.fabric.api.client.event.lifecycle.v1.ClientTickEvents;
 import net.fabricmc.fabric.api.client.rendering.v1.RenderStateDataKey;
+import net.fabricmc.fabric.api.client.rendering.v1.level.LevelExtractionEvents;
+import net.fabricmc.fabric.api.client.rendering.v1.level.LevelRenderContext;
 import net.fabricmc.fabric.api.client.rendering.v1.level.LevelRenderEvents;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.renderer.RenderPipelines;
+import net.minecraft.client.renderer.SubmitNodeCollection;
+import net.minecraft.client.renderer.SubmitNodeCollector;
+import net.minecraft.client.renderer.feature.CustomFeatureRenderer;
 import net.minecraft.client.renderer.rendertype.LayeringTransform;
 import net.minecraft.client.renderer.rendertype.OutputTarget;
 import net.minecraft.client.renderer.rendertype.RenderSetup;
 import net.minecraft.client.renderer.rendertype.RenderType;
-import net.minecraft.client.renderer.state.level.LevelRenderState;
 import net.minecraft.resources.Identifier;
 import net.minecraft.world.phys.AABB;
 import net.minecraft.world.phys.Vec3;
@@ -32,7 +35,7 @@ public class RenderQueue {
     private static final List<RemoveQueueEntry> removeQueue = new ArrayList<>();
     private static final EnumMap<Layer, Map<Object, Shape>> queue = new EnumMap<>(Layer.class);
 
-    private static final RenderStateDataKey<EnumMap<Layer, List<Line>>> LINES_KEY = RenderStateDataKey.create(() -> "clientcommands render queue");
+    private static final RenderStateDataKey<EnumMap<Layer, List<Shape.RenderState>>> RENDER_STATES_KEY = RenderStateDataKey.create(() -> "clientcommands render queue");
 
     private static final RenderPipeline LINES_NO_DEPTH_PIPELINE = RenderPipelines.register(
         RenderPipeline.builder(RenderPipelines.LINES_SNIPPET)
@@ -51,20 +54,17 @@ public class RenderQueue {
     static {
         ClientTickEvents.START_CLIENT_TICK.register(RenderQueue::tick);
 
-        LevelRenderEvents.END_EXTRACTION.register(context -> {
-            EnumMap<Layer, List<Line>> lines = new EnumMap<>(Layer.class);
+        LevelExtractionEvents.END_EXTRACTION.register(context -> {
+            EnumMap<Layer, List<Shape.RenderState>> renderStates = new EnumMap<>(Layer.class);
             queue.forEach((layer, shapes) -> {
-                List<Line> linesToRender = new ArrayList<>();
-                shapes.values().forEach(shape -> shape.addLines(linesToRender::add, context.camera(), context.deltaTracker()));
-                lines.put(layer, linesToRender);
+                List<Shape.RenderState> states = new ArrayList<>();
+                shapes.values().forEach(shape -> states.add(shape.extract(context)));
+                renderStates.put(layer, states);
             });
-            context.levelState().setData(LINES_KEY, lines);
+            context.levelState().setData(RENDER_STATES_KEY, renderStates);
         });
 
-        LevelRenderEvents.END_MAIN.register(context -> {
-            render(Layer.ON_TOP, context.bufferSource().getBuffer(LINES_NO_DEPTH_LAYER), context.poseStack(), context.levelState());
-            context.bufferSource().endBatch();
-        });
+        LevelRenderEvents.END_MAIN.register(context -> render(Layer.ON_TOP, LINES_NO_DEPTH_LAYER, context));
     }
 
     public static void register() {
@@ -130,19 +130,32 @@ public class RenderQueue {
         }
     }
 
-    private static void render(Layer layer, VertexConsumer vertexConsumer, PoseStack poseStack, LevelRenderState state) {
-        EnumMap<Layer, List<Line>> lines = state.getData(LINES_KEY);
-        if (lines == null) {
+    private static void render(Layer layer, RenderType renderType, LevelRenderContext context) {
+        EnumMap<Layer, List<Shape.RenderState>> renderStates = context.levelState().getData(RENDER_STATES_KEY);
+        if (renderStates == null) {
             return;
         }
 
-        List<Line> linesToRender = lines.get(layer);
-        if (linesToRender == null) {
+        List<Shape.RenderState> states = renderStates.get(layer);
+        if (states == null) {
             return;
         }
 
-        for (Line line : linesToRender) {
-            line.draw(vertexConsumer, poseStack);
+        for (Shape.RenderState state : states) {
+            state.render(context, renderType);
+        }
+    }
+
+    public static void submitCustomGeometry(
+        SubmitNodeCollector collector,
+        PoseStack poseStack,
+        RenderType renderType,
+        SubmitNodeCollector.CustomGeometryRenderer renderer
+    ) {
+        if (renderType == LINES_NO_DEPTH_LAYER && collector.order(0) instanceof SubmitNodeCollection collection) {
+            collection.alwaysOnTop.submit(new CustomFeatureRenderer.Submit(poseStack.last().copy(), renderType, renderer));
+        } else {
+            collector.submitCustomGeometry(poseStack, renderType, renderer);
         }
     }
 

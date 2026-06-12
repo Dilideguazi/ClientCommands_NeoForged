@@ -8,7 +8,7 @@ import net.earthcomputer.clientcommands.features.SuggestionsHook;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.player.LocalPlayer;
 import net.minecraft.network.protocol.game.ClientboundAddEntityPacket;
-import net.minecraft.world.entity.EntityType;
+import net.minecraft.world.entity.EntityTypes;
 import org.slf4j.Logger;
 
 import java.lang.ref.WeakReference;
@@ -137,7 +137,7 @@ public abstract class ItemThrowTask extends SimpleTask {
     }
 
     private static void handleItemSpawn(ClientboundAddEntityPacket packet) {
-        if (packet.getType() != EntityType.ITEM) {
+        if (packet.getType() != EntityTypes.ITEM) {
             return;
         }
 

@@ -8,7 +8,7 @@ import dev.xpple.clientarguments.arguments.CEntitySelector;
 import dev.xpple.clientarguments.arguments.CEntitySelectorParser;
 import net.fabricmc.fabric.api.client.command.v2.FabricClientCommandSource;
 import net.minecraft.ChatFormatting;
-import net.minecraft.advancements.criterion.NbtPredicate;
+import net.minecraft.advancements.predicates.NbtPredicate;
 import net.minecraft.commands.arguments.coordinates.Coordinates;
 import net.minecraft.commands.arguments.coordinates.LocalCoordinates;
 import net.minecraft.commands.arguments.coordinates.WorldCoordinates;

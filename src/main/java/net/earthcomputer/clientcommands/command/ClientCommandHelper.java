@@ -35,7 +35,7 @@ public class ClientCommandHelper {
     }
 
     public static void sendFeedback(Component message) {
-        Minecraft.getInstance().gui.getChat().addClientSystemMessage(message);
+        Minecraft.getInstance().gui.hud.getChat().addClientSystemMessage(message);
     }
 
     public static void sendRequiresRestart() {
@@ -44,7 +44,7 @@ public class ClientCommandHelper {
 
     public static void addOverlayMessage(Component message, int time) {
         Gui gui = Minecraft.getInstance().gui;
-        gui.setOverlayMessage(message, false);
-        gui.overlayMessageTime = time;
+        gui.hud.setOverlayMessage(message, false);
+        gui.hud.overlayMessageTime = time;
     }
 }

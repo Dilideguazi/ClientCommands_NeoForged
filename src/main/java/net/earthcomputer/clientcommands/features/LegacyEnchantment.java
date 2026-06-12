@@ -1,7 +1,7 @@
 package net.earthcomputer.clientcommands.features;
 
 import net.earthcomputer.clientcommands.util.MultiVersionCompat;
-import net.minecraft.advancements.criterion.MinMaxBounds;
+import net.minecraft.advancements.predicates.MinMaxBounds;
 import net.minecraft.core.component.DataComponents;
 import net.minecraft.network.chat.Component;
 import net.minecraft.resources.ResourceKey;

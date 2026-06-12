@@ -193,7 +193,7 @@ public class C2CPacketHandler implements C2CPacketListener {
         try {
             packet.handle(C2CPacketHandler.getInstance());
         } catch (Throwable e) {
-            Minecraft.getInstance().gui.getChat().addClientSystemMessage(Component.nullToEmpty(e.getMessage()));
+            Minecraft.getInstance().gui.hud.getChat().addClientSystemMessage(Component.nullToEmpty(e.getMessage()));
             LOGGER.error("Error handling C2C packet", e);
         }
         return true;
@@ -215,7 +215,7 @@ public class C2CPacketHandler implements C2CPacketListener {
         prefix.append(Component.literal("]").withStyle(ChatFormatting.DARK_GRAY));
         prefix.append(Component.literal(" "));
         Component component = prefix.append(Component.translatable("c2cpacket.messageC2CPacket.incoming", sender, formattedComponent));
-        Minecraft.getInstance().gui.getChat().addClientSystemMessage(component);
+        Minecraft.getInstance().gui.hud.getChat().addClientSystemMessage(component);
     }
 
     @Override

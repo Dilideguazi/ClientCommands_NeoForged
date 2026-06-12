@@ -36,43 +36,43 @@ public class CTitleCommand {
     }
 
     private static int executeClear(FabricClientCommandSource source) {
-        source.getClient().gui.clearTitles();
+        source.getClient().gui.hud.clearTitles();
 
         source.sendFeedback(Component.translatable("commands.ctitle.cleared"));
         return Command.SINGLE_SUCCESS;
     }
 
     private static int executeReset(FabricClientCommandSource source) {
-        source.getClient().gui.clearTitles();
-        source.getClient().gui.resetTitleTimes();
+        source.getClient().gui.hud.clearTitles();
+        source.getClient().gui.hud.resetTitleTimes();
 
         source.sendFeedback(Component.translatable("commands.ctitle.reset"));
         return Command.SINGLE_SUCCESS;
     }
 
     private static int executeTitle(FabricClientCommandSource source, Component title) {
-        source.getClient().gui.setTitle(title);
+        source.getClient().gui.hud.setTitle(title);
 
         sendFeedback(Component.translatable("commands.ctitle.show.title"));
         return Command.SINGLE_SUCCESS;
     }
 
     private static int executeSubtitle(FabricClientCommandSource source, Component title) {
-        source.getClient().gui.setSubtitle(title);
+        source.getClient().gui.hud.setSubtitle(title);
 
         sendFeedback(Component.translatable("commands.ctitle.show.subtitle"));
         return Command.SINGLE_SUCCESS;
     }
 
     private static int executeActionBar(FabricClientCommandSource source, Component title) {
-        source.getClient().gui.setOverlayMessage(title, false);
+        source.getClient().gui.hud.setOverlayMessage(title, false);
 
         sendFeedback(Component.translatable("commands.ctitle.show.actionbar"));
         return Command.SINGLE_SUCCESS;
     }
 
     private static int executeTimes(FabricClientCommandSource source, int fadeIn, int stay, int fadeOut) {
-        source.getClient().gui.setTimes(fadeIn, stay, fadeOut);
+        source.getClient().gui.hud.setTimes(fadeIn, stay, fadeOut);
 
         sendFeedback(Component.translatable("commands.ctitle.times"));
         return Command.SINGLE_SUCCESS;

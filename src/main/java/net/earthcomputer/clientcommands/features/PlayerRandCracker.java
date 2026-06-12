@@ -322,7 +322,7 @@ public class PlayerRandCracker {
 
             MutableComponent durability = Component.literal(String.valueOf(stack.getMaxDamage() - stack.getDamageValue() - 1)).withStyle(ChatFormatting.RED);
 
-            Minecraft.getInstance().gui.setOverlayMessage(
+            Minecraft.getInstance().gui.hud.setOverlayMessage(
                 Component.translatable("playerManip.toolBreakWarning", durability).withStyle(ChatFormatting.GOLD),
                 false);
         }
@@ -399,7 +399,7 @@ public class PlayerRandCracker {
         MultiPlayerGameMode interactionManager = mc.gameMode;
         assert player != null && interactionManager != null;
 
-        boolean isInContainer = mc.screen instanceof AbstractContainerScreen && !(mc.screen instanceof CreativeModeInventoryScreen);
+        boolean isInContainer = mc.gui.screen() instanceof AbstractContainerScreen && !(mc.gui.screen() instanceof CreativeModeInventoryScreen);
         boolean useCreativeThrow = player.hasInfiniteMaterials() && !isInContainer;
         if (useCreativeThrow) {
             // the client throttle is set a bit below the server throttle so we shouldn't get a desync here

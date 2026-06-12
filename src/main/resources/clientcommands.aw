@@ -7,7 +7,7 @@ accessible field net/minecraft/client/multiplayer/AccountProfileKeyPairManager k
 accessible field net/minecraft/client/gui/components/AbstractButton TEXT_MARGIN I
 
 # Command Handling
-accessible field net/minecraft/client/gui/Gui overlayMessageTime I
+accessible field net/minecraft/client/gui/Hud overlayMessageTime I
 accessible field net/minecraft/client/gui/components/CommandSuggestions ARGUMENT_STYLES Ljava/util/List;
 
 # Data Query Handler
@@ -22,8 +22,8 @@ accessible field net/minecraft/world/entity/item/ItemEntity DATA_ITEM Lnet/minec
 accessible method net/minecraft/world/entity/projectile/FishingHook canHitEntity (Lnet/minecraft/world/entity/Entity;)Z
 
 # cfps
-accessible field com/mojang/blaze3d/platform/ScreenManager monitors Lit/unimi/dsi/fastutil/longs/Long2ObjectMap;
-accessible field com/mojang/blaze3d/platform/Window screenManager Lcom/mojang/blaze3d/platform/ScreenManager;
+accessible field com/mojang/blaze3d/platform/MonitorManager monitors Lit/unimi/dsi/fastutil/longs/Long2ObjectMap;
+accessible field com/mojang/blaze3d/platform/Window monitorManager Lcom/mojang/blaze3d/platform/MonitorManager;
 
 # cgive
 accessible method net/minecraft/world/entity/player/Inventory addResource (ILnet/minecraft/world/item/ItemStack;)I

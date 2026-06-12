@@ -552,7 +552,7 @@ public class EnchantmentCracker {
                                     builder.append(Component.literal("|".repeat(filledWidth)).withColor(color));
                                     builder.append(Component.literal("|".repeat(unfilledWidth)).withColor(0xAAAAAA));
 
-                                    Minecraft.getInstance().gui.setOverlayMessage(builder, false);
+                                    Minecraft.getInstance().gui.hud.setOverlayMessage(builder, false);
                                 }
                             });
                         }
@@ -588,7 +588,7 @@ public class EnchantmentCracker {
                         @Override
                         public void run() {
                             if (Configs.enchCrackState == CrackState.CRACKED) {
-                                ChatComponent chat = Minecraft.getInstance().gui.getChat();
+                                ChatComponent chat = Minecraft.getInstance().gui.hud.getChat();
                                 ClientCommandHelper.sendFeedback(Component.translatable("enchCrack.insn.ready").withStyle(ChatFormatting.BOLD));
                                 ClientCommandHelper.sendFeedback("enchCrack.insn.bookshelves", finalResult.bookshelves);
                                 ClientCommandHelper.sendFeedback("enchCrack.insn.slot", finalResult.slot + 1);

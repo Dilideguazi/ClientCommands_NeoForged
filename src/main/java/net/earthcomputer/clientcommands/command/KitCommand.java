@@ -179,7 +179,7 @@ public class KitCommand {
             instantly along with the chat hud. Slightly delaying the opening of the
             screen fixes this issue.
          */
-        source.getClient().schedule(() -> source.getClient().setScreen(new PreviewScreen(new InventoryMenu(tempInv, true, source.getPlayer()), tempInv, name)));
+        source.getClient().schedule(() -> source.getClient().gui.setScreen(new PreviewScreen(new InventoryMenu(tempInv, true, source.getPlayer()), tempInv, name)));
         return Command.SINGLE_SUCCESS;
     }
 

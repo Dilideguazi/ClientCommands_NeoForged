@@ -6,6 +6,7 @@ import net.earthcomputer.clientcommands.util.CComponentUtil;
 import net.fabricmc.fabric.api.client.command.v2.FabricClientCommandSource;
 import net.minecraft.client.resources.language.I18n;
 import net.minecraft.core.BlockPos;
+import net.minecraft.locale.Language;
 import net.minecraft.network.chat.Component;
 import net.minecraft.network.chat.MutableComponent;
 import net.minecraft.resources.ResourceKey;
@@ -123,7 +124,7 @@ public class PosCommand {
      */
     private static String getLevelName(ResourceKey<Level> level) {
         String levelNameKey = "commands.cpos.level." + level.identifier().getPath();
-        if (I18n.exists(levelNameKey)) {
+        if (Language.getInstance().has(levelNameKey)) {
             return I18n.get(levelNameKey);
         } else {
             return level.identifier().getPath();

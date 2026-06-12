@@ -87,10 +87,10 @@ net/minecraft/world/entity/LivingEntity.handleEntityEvent (B)V <- net/minecraft/
 net/minecraft/world/entity/LivingEntity.handleEntityEvent (B)V <- net/minecraft/world/entity/Entity.random
 net/minecraft/world/entity/LivingEntity.handleEntityEvent (B)V <- net/minecraft/world/entity/Entity.random
 net/minecraft/world/entity/LivingEntity.handleEntityEvent (B)V <- net/minecraft/world/entity/Entity.random
-net/minecraft/world/entity/LivingEntity.knockback (DDD)V <- net/minecraft/world/entity/Entity.random
-net/minecraft/world/entity/LivingEntity.knockback (DDD)V <- net/minecraft/world/entity/Entity.random
-net/minecraft/world/entity/LivingEntity.knockback (DDD)V <- net/minecraft/world/entity/Entity.random
-net/minecraft/world/entity/LivingEntity.knockback (DDD)V <- net/minecraft/world/entity/Entity.random
+net/minecraft/world/entity/LivingEntity.knockback (DDDLnet/minecraft/world/damagesource/DamageSource;FZ)V <- net/minecraft/world/entity/Entity.random
+net/minecraft/world/entity/LivingEntity.knockback (DDDLnet/minecraft/world/damagesource/DamageSource;FZ)V <- net/minecraft/world/entity/Entity.random
+net/minecraft/world/entity/LivingEntity.knockback (DDDLnet/minecraft/world/damagesource/DamageSource;FZ)V <- net/minecraft/world/entity/Entity.random
+net/minecraft/world/entity/LivingEntity.knockback (DDDLnet/minecraft/world/damagesource/DamageSource;FZ)V <- net/minecraft/world/entity/Entity.random
 net/minecraft/world/entity/LivingEntity.handleEntityEvent (B)V <- net/minecraft/world/entity/LivingEntity.makeDrownParticles <- net/minecraft/world/entity/Entity.random
 net/minecraft/world/entity/LivingEntity.makePoofParticles ()V <- net/minecraft/world/entity/Entity.random
 net/minecraft/world/entity/LivingEntity.makePoofParticles ()V <- net/minecraft/world/entity/Entity.random

@@ -205,7 +205,7 @@ public class TwoPlayerGame<T, S extends Screen> {
         final Minecraft mc = Minecraft.getInstance();
         T game = activeGames.get(opponentUuid);
         if (game != null) {
-            mc.schedule(() -> mc.setScreen(this.screenFactory.createScreen(game)));
+            mc.schedule(() -> mc.gui.setScreen(this.screenFactory.createScreen(game)));
             return true;
         } else {
             return false;

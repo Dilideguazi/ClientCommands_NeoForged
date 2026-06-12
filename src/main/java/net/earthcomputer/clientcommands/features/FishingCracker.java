@@ -42,7 +42,7 @@ import net.minecraft.world.InteractionHand;
 import net.minecraft.world.InteractionResult;
 import net.minecraft.world.entity.Entity;
 import net.minecraft.world.entity.EntityDimensions;
-import net.minecraft.world.entity.EntityType;
+import net.minecraft.world.entity.EntityTypes;
 import net.minecraft.world.entity.projectile.FishingHook;
 import net.minecraft.world.entity.projectile.ProjectileUtil;
 import net.minecraft.world.item.ItemStack;
@@ -316,7 +316,7 @@ public class FishingCracker {
         MoreClientEntityEvents.POST_ADD.register(packet -> {
             LocalPlayer player = Minecraft.getInstance().player;
             if (player != null && canManipulateFishing()) {
-                if (packet.getData() == player.getId() && packet.getType() == EntityType.FISHING_BOBBER) {
+                if (packet.getData() == player.getId() && packet.getType() == EntityTypes.FISHING_BOBBER) {
                     processBobberSpawn(packet.getUUID(), new Vec3(packet.getX(), packet.getY(), packet.getZ()), packet.getMovement());
                 }
             }
@@ -328,7 +328,7 @@ public class FishingCracker {
                 return;
             }
 
-            if (!canManipulateFishing() || packet.getData() != player.getId() || packet.getType() != EntityType.FISHING_BOBBER) {
+            if (!canManipulateFishing() || packet.getData() != player.getId() || packet.getType() != EntityTypes.FISHING_BOBBER) {
                 return;
             }
 
@@ -879,7 +879,7 @@ public class FishingCracker {
     // region FISHING BOBBER SIMULATION
 
     private static class SimulatedFishingBobber {
-        private static final EntityDimensions FISHING_BOBBER_DIMENSIONS = EntityType.FISHING_BOBBER.getDimensions();
+        private static final EntityDimensions FISHING_BOBBER_DIMENSIONS = EntityTypes.FISHING_BOBBER.getDimensions();
 
         private final Level level = Objects.requireNonNull(Minecraft.getInstance().level);
 

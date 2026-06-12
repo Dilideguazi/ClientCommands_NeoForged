@@ -51,7 +51,7 @@ public class MinesweeperCommand {
             throw TOO_MANY_MINES_EXCEPTION.create();
         }
 
-        source.getClient().schedule(() -> source.getClient().setScreen(new MinesweeperGameScreen(width, height, mines)));
+        source.getClient().schedule(() -> source.getClient().gui.setScreen(new MinesweeperGameScreen(width, height, mines)));
 
         return Command.SINGLE_SUCCESS;
     }

@@ -1,17 +1,17 @@
 package net.earthcomputer.clientcommands.render;
 
-import net.minecraft.client.Camera;
-import net.minecraft.client.DeltaTracker;
+import com.mojang.blaze3d.vertex.PoseStack;
+import com.mojang.blaze3d.vertex.VertexConsumer;
+import net.fabricmc.fabric.api.client.rendering.v1.level.LevelExtractionContext;
+import net.fabricmc.fabric.api.client.rendering.v1.level.LevelRenderContext;
+import net.minecraft.client.renderer.rendertype.RenderType;
 import net.minecraft.world.phys.AABB;
 import net.minecraft.world.phys.Vec3;
 
-import java.util.function.Consumer;
-
 public class Cuboid extends Shape {
-
-    private final Line[] edges = new Line[12];
-    public final Vec3 start;
-    public final Vec3 size;
+    private final Vec3 start;
+    private final Vec3 size;
+    private final int color;
 
     public Cuboid(AABB box, int color) {
         this(new Vec3(box.minX, box.minY, box.minZ), new Vec3(box.maxX, box.maxY, box.maxZ), color);
@@ -20,26 +20,19 @@ public class Cuboid extends Shape {
     public Cuboid(Vec3 start, Vec3 end, int color) {
         this.start = start;
         this.size = new Vec3(end.x() - start.x(), end.y() - start.y(), end.z() - start.z());
-        this.edges[0] = new Line(this.start, this.start.add(this.size.x(), 0, 0), color);
-        this.edges[1] = new Line(this.start, this.start.add(0, this.size.y(), 0), color);
-        this.edges[2] = new Line(this.start, this.start.add(0, 0, this.size.z()), color);
-        this.edges[3] = new Line(this.start.add(this.size.x(), 0, this.size.z()), this.start.add(this.size.x(), 0, 0), color);
-        this.edges[4] = new Line(this.start.add(this.size.x(), 0, this.size.z()), this.start.add(this.size.x(), this.size.y(), this.size.z()), color);
-        this.edges[5] = new Line(this.start.add(this.size.x(), 0, this.size.z()), this.start.add(0, 0, this.size.z()), color);
-        this.edges[6] = new Line(this.start.add(this.size.x(), this.size.y(), 0), this.start.add(this.size.x(), 0, 0), color);
-        this.edges[7] = new Line(this.start.add(this.size.x(), this.size.y(), 0), this.start.add(0, this.size.y(), 0), color);
-        this.edges[8] = new Line(this.start.add(this.size.x(), this.size.y(), 0), this.start.add(this.size.x(), this.size.y(), this.size.z()), color);
-        this.edges[9] = new Line(this.start.add(0, this.size.y(), this.size.z()), this.start.add(0, 0, this.size.z()), color);
-        this.edges[10] = new Line(this.start.add(0, this.size.y(), this.size.z()), this.start.add(0, this.size.y(), 0), color);
-        this.edges[11] = new Line(this.start.add(0, this.size.y(), this.size.z()), this.start.add(this.size.x(), this.size.y(), this.size.z()), color);
+        this.color = color;
     }
 
     @Override
-    public void addLines(Consumer<Line> lines, Camera camera, DeltaTracker deltaTracker) {
+    public Shape.RenderState extract(LevelExtractionContext context) {
         Vec3 prevPosOffset = prevPos.subtract(getPos());
-        for (Line edge : this.edges) {
-            lines.accept(edge.toCameraView(camera, deltaTracker, prevPosOffset));
-        }
+        float delta = context.deltaTracker().getRealtimeDeltaTicks();
+        Vec3 cameraPos = context.camera().position();
+        return new RenderState(
+            start.add(prevPosOffset.scale(1 - delta)).subtract(cameraPos),
+            size,
+            color
+        );
     }
 
     @Override
@@ -47,4 +40,25 @@ public class Cuboid extends Shape {
         return start;
     }
 
+    private record RenderState(Vec3 start, Vec3 size, int color) implements Shape.RenderState {
+        @Override
+        public void render(LevelRenderContext context, RenderType renderType) {
+            RenderQueue.submitCustomGeometry(context.submitNodeCollector(), context.poseStack(), renderType, this::draw);
+        }
+
+        private void draw(PoseStack.Pose pose, VertexConsumer vertexConsumer) {
+            Line.drawLine(pose, vertexConsumer, this.start, this.start.add(this.size.x(), 0, 0), color);
+            Line.drawLine(pose, vertexConsumer, this.start, this.start.add(0, this.size.y(), 0), color);
+            Line.drawLine(pose, vertexConsumer, this.start, this.start.add(0, 0, this.size.z()), color);
+            Line.drawLine(pose, vertexConsumer, this.start.add(this.size.x(), 0, this.size.z()), this.start.add(this.size.x(), 0, 0), color);
+            Line.drawLine(pose, vertexConsumer, this.start.add(this.size.x(), 0, this.size.z()), this.start.add(this.size.x(), this.size.y(), this.size.z()), color);
+            Line.drawLine(pose, vertexConsumer, this.start.add(this.size.x(), 0, this.size.z()), this.start.add(0, 0, this.size.z()), color);
+            Line.drawLine(pose, vertexConsumer, this.start.add(this.size.x(), this.size.y(), 0), this.start.add(this.size.x(), 0, 0), color);
+            Line.drawLine(pose, vertexConsumer, this.start.add(this.size.x(), this.size.y(), 0), this.start.add(0, this.size.y(), 0), color);
+            Line.drawLine(pose, vertexConsumer, this.start.add(this.size.x(), this.size.y(), 0), this.start.add(this.size.x(), this.size.y(), this.size.z()), color);
+            Line.drawLine(pose, vertexConsumer, this.start.add(0, this.size.y(), this.size.z()), this.start.add(0, 0, this.size.z()), color);
+            Line.drawLine(pose, vertexConsumer, this.start.add(0, this.size.y(), this.size.z()), this.start.add(0, this.size.y(), 0), color);
+            Line.drawLine(pose, vertexConsumer, this.start.add(0, this.size.y(), this.size.z()), this.start.add(this.size.x(), this.size.y(), this.size.z()), color);
+        }
+    }
 }

@@ -57,9 +57,9 @@ public class Relogger {
         isRelogging = false;
 
         if (singleplayer) {
-            mc.setScreen(new TitleScreen());
+            mc.gui.setScreen(new TitleScreen());
         } else {
-            mc.setScreen(new JoinMultiplayerScreen(new TitleScreen()));
+            mc.gui.setScreen(new JoinMultiplayerScreen(new TitleScreen()));
         }
 
         return true;
@@ -92,7 +92,7 @@ public class Relogger {
         if (!mc.getLevelSource().levelExists(levelName)) {
             return false;
         }
-        mc.createWorldOpenFlows().openWorld(levelName, () -> mc.setScreen(new TitleScreen()));
+        mc.createWorldOpenFlows().openWorld(levelName, () -> mc.gui.setScreen(new TitleScreen()));
         return true;
     }
 
@@ -104,20 +104,20 @@ public class Relogger {
         }
         isRelogging = true;
         cachedServerData = serverData;
-        ConnectScreen.startConnecting(mc.screen, mc, ServerAddress.parseString(serverData.ip), serverData, false, null);
+        ConnectScreen.startConnecting(mc.gui.screen(), mc, ServerAddress.parseString(serverData.ip), serverData, false, null);
         return true;
     }
 
     public static void onFailedRelog() {
         Minecraft mc = Minecraft.getInstance();
         // only possible if the user clicks off and "cancels"
-        if (!(mc.screen instanceof DisconnectedScreen screen) || cachedServerData == null) {
+        if (!(mc.gui.screen() instanceof DisconnectedScreen screen) || cachedServerData == null) {
             isRelogging = false;
             cachedServerData = null;
             return;
         }
 
-        mc.setScreen(screen.parent);
+        mc.gui.setScreen(screen.parent);
 
         ServerData serverData = cachedServerData;
         cachedServerData = null;

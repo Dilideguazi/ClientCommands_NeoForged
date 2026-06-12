@@ -37,7 +37,7 @@ public class SnakeCommand {
             instantly along with the chat hud. Slightly delaying the opening of the
             screen fixes this issue.
          */
-        source.getClient().schedule(() -> source.getClient().setScreen(new SnakeGameScreen()));
+        source.getClient().schedule(() -> source.getClient().gui.setScreen(new SnakeGameScreen()));
         return Command.SINGLE_SUCCESS;
     }
 }

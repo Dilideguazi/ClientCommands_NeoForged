@@ -131,7 +131,7 @@ public class ChorusManipulation {
                 }, Configs.getMaxChorusItemThrows());
         if (!throwItemsState.isSuccess()) {
             throwItemsState.sendErrorMessage();
-            Minecraft.getInstance().gui.setOverlayMessage(
+            Minecraft.getInstance().gui.hud.setOverlayMessage(
                     Component.translatable("chorusManip.landing.failed").withStyle(ChatFormatting.RED), false);
             return false;
         } else {

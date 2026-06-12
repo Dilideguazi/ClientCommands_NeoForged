@@ -120,7 +120,7 @@ public class ExtendedMarkdownArgument implements ArgumentType<MutableComponent> 
                     if (word.length() == 1) {
                         ChatFormatting legacyFormatting = ChatFormatting.getByCode(word.charAt(0));
                         if (legacyFormatting != null && legacyFormatting != ChatFormatting.RESET) {
-                            word = legacyFormatting.getName().toLowerCase(Locale.ROOT);
+                            word = legacyFormatting.name().toLowerCase(Locale.ROOT);
                         }
                     }
 
