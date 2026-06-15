@@ -9,6 +9,7 @@ import com.mojang.brigadier.context.CommandContext;
 import com.mojang.brigadier.exceptions.CommandSyntaxException;
 import com.mojang.brigadier.exceptions.DynamicCommandExceptionType;
 import com.mojang.brigadier.exceptions.SimpleCommandExceptionType;
+import net.earthcomputer.clientcommands.server.ClientCommandsServer;
 import net.fabricmc.fabric.api.client.command.v2.FabricClientCommandSource;
 import net.minecraft.client.Minecraft;
 import net.minecraft.core.BlockPos;
@@ -43,6 +44,7 @@ public class GetDataCommand {
     private static final Function<String, AccessorType> CLIENT_ENTITY_DATA_ACCESSOR = argName -> new AccessorType() {
         @Override
         public DataAccessor getAccessor(CommandContext<FabricClientCommandSource> ctx) throws CommandSyntaxException {
+            ClientCommandsServer.requirePrivileges();
             return new EntityDataAccessor(getEntity(ctx, argName));
         }
 
