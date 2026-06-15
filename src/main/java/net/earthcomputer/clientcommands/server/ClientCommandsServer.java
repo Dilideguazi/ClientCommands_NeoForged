@@ -44,9 +44,7 @@ public class ClientCommandsServer implements ModInitializer {
             return;
         }
 
-        if (!ClientPlayNetworking.canSend(OptInPayload.TYPE)) {
-            throw MUST_BE_INSTALLED_EXCEPTION.create();
-        }
+        throw MUST_BE_INSTALLED_EXCEPTION.create();
     }
 
     private enum OptInPayload implements CustomPacketPayload {
