@@ -5,6 +5,7 @@ import com.mojang.brigadier.CommandDispatcher;
 import com.mojang.brigadier.context.CommandContext;
 import com.mojang.brigadier.exceptions.CommandSyntaxException;
 import net.earthcomputer.clientcommands.command.arguments.ClientBlockPredicateArgument;
+import net.earthcomputer.clientcommands.server.ClientCommandsServer;
 import net.earthcomputer.clientcommands.task.RenderDistanceScanTask;
 import net.earthcomputer.clientcommands.task.TaskManager;
 import net.earthcomputer.clientcommands.util.CComponentUtil;
@@ -41,6 +42,7 @@ public class FindBlockCommand {
     }
 
     public static int findBlock(CommandContext<FabricClientCommandSource> ctx, Component startingMessage, ClientBlockPredicate block) throws CommandSyntaxException {
+        ClientCommandsServer.requirePrivileges();
         boolean keepSearching = getFlag(ctx, FLAG_KEEP_SEARCHING);
         sendFeedback(startingMessage);
         TaskManager.addTask("cfindblock", new FindBlockTask(block, keepSearching));

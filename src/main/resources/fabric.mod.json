@@ -4,7 +4,7 @@
   "name": "Client Commands",
   "description": "Useful client-side commands",
   "version": "${version}",
-  "environment": "client",
+  "environment": "*",
   "license": "LGPL-3.0-or-later",
   "icon": "assets/clientcommands/icon.png",
   "contact": {
@@ -23,6 +23,9 @@
   "entrypoints": {
     "client": [
       "net.earthcomputer.clientcommands.ClientCommands"
+    ],
+    "main": [
+      "net.earthcomputer.clientcommands.server.ClientCommandsServer"
     ]
   },
   "depends": {
@@ -34,7 +37,10 @@
     "simplewaypoints": "*"
   },
   "mixins": [
-    "mixins.clientcommands.json"
+    {
+      "config": "mixins.clientcommands.json",
+      "environment": "client"
+    }
   ],
   "accessWidener": "clientcommands.aw",
   "custom": {

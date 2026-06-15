@@ -5,6 +5,7 @@ import com.mojang.brigadier.CommandDispatcher;
 import com.mojang.brigadier.exceptions.CommandSyntaxException;
 import com.mojang.brigadier.exceptions.SimpleCommandExceptionType;
 import dev.xpple.clientarguments.arguments.CEntitySelector;
+import net.earthcomputer.clientcommands.server.ClientCommandsServer;
 import net.earthcomputer.clientcommands.task.LongTask;
 import net.earthcomputer.clientcommands.task.TaskManager;
 import net.earthcomputer.clientcommands.util.CComponentUtil;
@@ -37,6 +38,7 @@ public class FindCommand {
     }
 
     private static int listEntities(FabricClientCommandSource source, CEntitySelector selector) throws CommandSyntaxException {
+        ClientCommandsServer.requirePrivileges();
         boolean keepSearching = getFlag(source, FLAG_KEEP_SEARCHING);
         if (keepSearching) {
             String taskName = TaskManager.addTask("cfind", new FindTask(source, selector));

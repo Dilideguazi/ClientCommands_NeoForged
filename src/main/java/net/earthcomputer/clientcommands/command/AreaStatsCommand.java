@@ -5,6 +5,7 @@ import com.mojang.brigadier.CommandDispatcher;
 import com.mojang.brigadier.exceptions.CommandSyntaxException;
 import com.mojang.brigadier.exceptions.SimpleCommandExceptionType;
 import net.earthcomputer.clientcommands.render.RenderQueue;
+import net.earthcomputer.clientcommands.server.ClientCommandsServer;
 import net.fabricmc.fabric.api.client.command.v2.FabricClientCommandSource;
 import net.minecraft.client.multiplayer.ClientLevel;
 import net.minecraft.commands.CommandBuildContext;
@@ -35,6 +36,8 @@ public class AreaStatsCommand {
     }
 
     private static int areaStats(FabricClientCommandSource source, BlockPos pos1, BlockPos pos2, ClientBlockPredicate blockPredicate) throws CommandSyntaxException {
+        ClientCommandsServer.requirePrivileges();
+
         final ClientLevel level = source.getLevel();
         chunkSource = level.getChunkSource();
         assertChunkIsLoaded(pos1.getX() >> 4, pos1.getZ() >> 4);
