@@ -1,6 +1,7 @@
 package net.earthcomputer.clientcommands.mixin.rngevents;
 
 import net.earthcomputer.clientcommands.features.PlayerRandCracker;
+import net.minecraft.client.player.LocalPlayer;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.inventory.AnvilMenu;
 import net.minecraft.world.item.ItemStack;
@@ -14,7 +15,7 @@ public class AnvilMenuMixin {
 
     @Inject(method = "onTake", at = @At("HEAD"))
     public void onAnvilUse(Player player, ItemStack stack, CallbackInfo ci) {
-        if (!player.getAbilities().instabuild) {
+        if (player instanceof LocalPlayer && !player.getAbilities().instabuild) {
             PlayerRandCracker.onAnvilUse();
         }
     }
