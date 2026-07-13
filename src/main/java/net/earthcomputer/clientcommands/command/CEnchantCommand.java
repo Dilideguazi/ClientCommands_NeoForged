@@ -51,7 +51,7 @@ public class CEnchantCommand {
         } else {
             inEnchantingTable = ench.is(EnchantmentTags.IN_ENCHANTING_TABLE);
         }
-        return inEnchantingTable && (item == Items.BOOK || ench.value().canEnchant(new ItemStack(item)));
+        return inEnchantingTable && (item == Items.BOOK || ench.value().isPrimaryItem(new ItemStack(item)));
     }
 
     private static int cenchant(FabricClientCommandSource source, ItemAndEnchantmentsPredicate itemAndEnchantmentsPredicate) throws CommandSyntaxException {
