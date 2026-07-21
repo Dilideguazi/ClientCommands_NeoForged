@@ -81,6 +81,7 @@
     "commands.reply.ClientPacketListenerMixin",
     "commands.snap.MinecraftMixin",
     "commands.time.ClientClockManagerMixin",
+    "commands.translate.ChatComponent_1Mixin",
     "dataqueryhandler.ClientPacketListenerMixin",
     "events.ClientPacketListenerMixin",
     "events.GuiMixin",
