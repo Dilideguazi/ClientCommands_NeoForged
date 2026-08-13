@@ -1,0 +1,255 @@
+//
+// Source code recreated from a .class file by IntelliJ IDEA
+// (powered by Fernflower decompiler)
+//
+
+package dev.xpple.betterconfig.impl;
+
+import com.google.common.collect.ImmutableMap;
+import com.google.gson.Gson;
+import com.google.gson.JsonObject;
+import com.mojang.brigadier.arguments.*;
+import com.mojang.brigadier.context.CommandContext;
+import com.mojang.brigadier.exceptions.CommandSyntaxException;
+import com.mojang.brigadier.suggestion.SuggestionProvider;
+import dev.xpple.betterconfig.BetterConfig;
+import dev.xpple.betterconfig.api.Config;
+import dev.xpple.betterconfig.api.ModConfig;
+import dev.xpple.betterconfig.util.CheckedBiConsumer;
+import dev.xpple.betterconfig.util.CheckedBiFunction;
+import dev.xpple.betterconfig.util.CheckedConsumer;
+import dev.xpple.betterconfig.util.Pair;
+import net.minecraft.commands.CommandBuildContext;
+import net.minecraft.commands.SharedSuggestionProvider;
+
+import java.io.BufferedWriter;
+import java.io.IOException;
+import java.lang.reflect.Field;
+import java.lang.reflect.ParameterizedType;
+import java.lang.reflect.Type;
+import java.nio.file.Files;
+import java.nio.file.Path;
+import java.util.HashMap;
+import java.util.Map;
+import java.util.function.Function;
+import java.util.function.Predicate;
+
+@SuppressWarnings({"unchecked", "rawtypes"})
+public class ModConfigImpl implements ModConfig {
+    private static final Map<Class<?>, Function<CommandBuildContext, ArgumentType<?>>> defaultArguments;
+    private final String modId;
+    private final Class<?> configsClass;
+    private final Gson gson;
+    private final Gson inlineGson;
+    private final Map<Class<?>, Function<CommandBuildContext, ? extends ArgumentType<?>>> arguments;
+    private final Map<Class<?>, Pair<SuggestionProvider<? extends SharedSuggestionProvider>, CheckedBiFunction<CommandContext<? extends SharedSuggestionProvider>, String, ?, CommandSyntaxException>>> suggestors;
+    private final Map<String, Field> configs = new HashMap<>();
+    private final Map<String, Object> defaults = new HashMap<>();
+    private final Map<String, String> comments = new HashMap<>();
+    private final Map<String, CheckedConsumer<Object, CommandSyntaxException>> setters = new HashMap<>();
+    private final Map<String, CheckedConsumer<Object, CommandSyntaxException>> adders = new HashMap<>();
+    private final Map<String, CheckedBiConsumer<Object, Object, CommandSyntaxException>> putters = new HashMap<>();
+    private final Map<String, CheckedConsumer<Object, CommandSyntaxException>> removers = new HashMap<>();
+    private final Map<String, Predicate<SharedSuggestionProvider>> conditions = new HashMap<>();
+    private final Map<String, Config> annotations = new HashMap<>();
+
+    public ModConfigImpl(String modId, Class<?> configsClass, Gson gson, Map<Class<?>, Function<CommandBuildContext, ? extends ArgumentType<?>>> arguments, Map<Class<?>, Pair<SuggestionProvider<? extends SharedSuggestionProvider>, CheckedBiFunction<CommandContext<? extends SharedSuggestionProvider>, String, ?, CommandSyntaxException>>> suggestors) {
+        this.modId = modId;
+        this.configsClass = configsClass;
+        this.gson = gson.newBuilder().setPrettyPrinting().create();
+        this.inlineGson = gson;
+        this.arguments = arguments;
+        this.suggestors = suggestors;
+    }
+
+    public String getModId() {
+        return this.modId;
+    }
+
+    public Class<?> getConfigsClass() {
+        return this.configsClass;
+    }
+
+    public Gson getGson() {
+        return this.gson;
+    }
+
+    public Function<CommandBuildContext, ? extends ArgumentType<?>> getArgument(Class<?> type) {
+        return (Function)this.arguments.getOrDefault(type, (Function)defaultArguments.get(type));
+    }
+
+    public Pair<SuggestionProvider<? extends SharedSuggestionProvider>, CheckedBiFunction<CommandContext<? extends SharedSuggestionProvider>, String, ?, CommandSyntaxException>> getSuggestor(Class<?> type) {
+        return this.suggestors.get(type);
+    }
+
+    public Path getConfigsPath() {
+        return BetterConfig.MOD_PATH.resolve(this.modId).resolve("config.json");
+    }
+
+    public Object get(String config) {
+        Field field = this.configs.get(config);
+        if (field == null) {
+            throw new IllegalArgumentException();
+        } else {
+            try {
+                return field.get(null);
+            } catch (ReflectiveOperationException e) {
+                throw new AssertionError(e);
+            }
+        }
+    }
+
+    public String asString(String config) {
+        Object value = this.get(config);
+        return this.asString(value);
+    }
+
+    public String asString(Object value) {
+        return this.inlineGson.toJson(value);
+    }
+
+    public void reset(String config) {
+        Field field = this.configs.get(config);
+        if (field == null) {
+            throw new IllegalArgumentException();
+        } else {
+            try {
+                field.set((Object)null, this.defaults.get(config));
+            } catch (ReflectiveOperationException e) {
+                throw new AssertionError(e);
+            }
+
+            this.save();
+        }
+    }
+
+    public void set(String config, Object value) throws CommandSyntaxException {
+        CheckedConsumer<Object, CommandSyntaxException> setter = this.setters.get(config);
+        if (setter == null) {
+            throw new IllegalArgumentException();
+        } else {
+            setter.accept(value);
+            this.save();
+        }
+    }
+
+    public void add(String config, Object value) throws CommandSyntaxException {
+        CheckedConsumer<Object, CommandSyntaxException> adder = this.adders.get(config);
+        if (adder == null) {
+            throw new IllegalArgumentException();
+        } else {
+            adder.accept(value);
+            this.save();
+        }
+    }
+
+    public void put(String config, Object key, Object value) throws CommandSyntaxException {
+        CheckedBiConsumer<Object, Object, CommandSyntaxException> putter = this.putters.get(config);
+        if (putter == null) {
+            throw new IllegalArgumentException();
+        } else {
+            putter.accept(key, value);
+            this.save();
+        }
+    }
+
+    public void remove(String config, Object value) throws CommandSyntaxException {
+        CheckedConsumer<Object, CommandSyntaxException> remover = this.removers.get(config);
+        if (remover == null) {
+            throw new IllegalArgumentException();
+        } else {
+            remover.accept(value);
+            this.save();
+        }
+    }
+
+    public void resetTemporaryConfigs() {
+        for(String config : this.configs.keySet()) {
+            if (this.annotations.get(config).temporary()) {
+                this.reset(config);
+            }
+        }
+
+    }
+
+    public Class<?> getType(String config) {
+        Field field = this.configs.get(config);
+        if (field == null) {
+            throw new IllegalArgumentException();
+        } else {
+            return field.getType();
+        }
+    }
+
+    public Type[] getParameterTypes(String config) {
+        Field field = this.configs.get(config);
+        if (field == null) {
+            throw new IllegalArgumentException();
+        } else {
+            return ((ParameterizedType)field.getGenericType()).getActualTypeArguments();
+        }
+    }
+
+    public boolean save() {
+        try {
+            try (BufferedWriter writer = Files.newBufferedWriter(this.getConfigsPath())) {
+                JsonObject root = new JsonObject();
+                this.getConfigs().keySet().forEach((config) -> {
+                    if (!this.getAnnotations().get(config).temporary()) {
+                        Object value = this.get(config);
+                        root.add(config, this.gson.toJsonTree(value));
+                    }
+                });
+                writer.write(this.gson.toJson(root));
+            }
+
+            return true;
+        } catch (IOException e) {
+            BetterConfig.LOGGER.error("Could not save config file.");
+            //noinspection all
+            e.printStackTrace();
+            return false;
+        }
+    }
+
+    public Map<String, Field> getConfigs() {
+        return this.configs;
+    }
+
+    public Map<String, Object> getDefaults() {
+        return this.defaults;
+    }
+
+    public Map<String, String> getComments() {
+        return this.comments;
+    }
+
+    public Map<String, CheckedConsumer<Object, CommandSyntaxException>> getSetters() {
+        return this.setters;
+    }
+
+    public Map<String, CheckedConsumer<Object, CommandSyntaxException>> getAdders() {
+        return this.adders;
+    }
+
+    public Map<String, CheckedBiConsumer<Object, Object, CommandSyntaxException>> getPutters() {
+        return this.putters;
+    }
+
+    public Map<String, CheckedConsumer<Object, CommandSyntaxException>> getRemovers() {
+        return this.removers;
+    }
+
+    public Map<String, Predicate<SharedSuggestionProvider>> getConditions() {
+        return this.conditions;
+    }
+
+    public Map<String, Config> getAnnotations() {
+        return this.annotations;
+    }
+
+    static {
+        ImmutableMap.Builder<Class<?>, Function<CommandBuildContext, ArgumentType<?>>> builder = ImmutableMap.builder();
+        defaultArguments = builder.put(Boolean.TYPE, (registryAccess) -> BoolArgumentType.bool()).put(Boolean.class, (registryAccess) -> BoolArgumentType.bool()).put(Double.TYPE, (registryAccess) -> DoubleArgumentType.doubleArg()).put(Double.class, (registryAccess) -> DoubleArgumentType.doubleArg()).put(Float.TYPE, (registryAccess) -> FloatArgumentType.floatArg()).put(Float.class, (registryAccess) -> FloatArgumentType.floatArg()).put(Integer.TYPE, (registryAccess) -> IntegerArgumentType.integer()).put(Integer.class, (registryAccess) -> IntegerArgumentType.integer()).put(Long.TYPE, (registryAccess) -> LongArgumentType.longArg()).put(Long.class, (registryAccess) -> LongArgumentType.longArg()).put(String.class, (registryAccess) -> StringArgumentType.string()).build();
+    }
+}
