@@ -34,7 +34,7 @@ public final class BuildInfo {
         try (InputStream is = ModList.get()
                 .getModContainerById(Client_commands_neoforged.MOD_ID)
                 .flatMap(container -> Optional.ofNullable(
-                        container.getClass().getClassLoader().getResourceAsStream("templates/META-INF/build_info.json")
+                        container.getClass().getClassLoader().getResourceAsStream("build_info.json")
                 )).orElseThrow();
              BufferedReader reader = new BufferedReader(new InputStreamReader(is))
         ) {
