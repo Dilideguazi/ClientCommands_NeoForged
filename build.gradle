@@ -208,6 +208,5 @@ tasks.register('generateGitInfo') {
 }
 
 processResources {
-    from generateGitInfo
     dependsOn generateGitInfo
 }
