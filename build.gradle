@@ -180,7 +180,7 @@ import com.google.gson.Gson
 import com.google.gson.GsonBuilder
 
 tasks.register('generateGitInfo') {
-    def outputFile = file("${buildDir}/generated/build_info.json")
+    def outputFile = file("${getBuildDir()}/generated/build_info.json")
     outputs.file(outputFile)
 
     def modVersion = mod_version
@@ -205,4 +205,9 @@ tasks.register('generateGitInfo') {
 
         println "Generated Git info: ${json}"
     }
+}
+
+processResources {
+    from generateGitInfo
+    dependsOn generateGitInfo
 }
