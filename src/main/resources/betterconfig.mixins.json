@@ -1,0 +1,18 @@
+{
+  "required": true,
+  "minVersion": "0.8",
+  "package": "dev.xpple.betterconfig.mixin",
+  "compatibilityLevel": "JAVA_25",
+  "mixins": [
+    "ArgumentCommandNodeMixin",
+    "RequiredArgumentBuilderAccessor"
+  ],
+  "client": [
+  ],
+  "injectors": {
+    "defaultRequire": 1
+  },
+  "overwrites": {
+    "requireAnnotations": true
+  }
+}
