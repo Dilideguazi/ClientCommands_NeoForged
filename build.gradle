@@ -211,3 +211,6 @@ processResources {
     from generateGitInfo
     dependsOn generateGitInfo
 }
+
+runClient.dependsOn processResources
+build.dependsOn processResources
