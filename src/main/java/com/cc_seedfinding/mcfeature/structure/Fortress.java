@@ -1,0 +1,82 @@
+package com.cc_seedfinding.mcfeature.structure;
+
+import com.cc_seedfinding.mcbiome.biome.Biome;
+import com.cc_seedfinding.mcbiome.biome.Biomes;
+import com.cc_seedfinding.mcbiome.source.BiomeSource;
+import com.cc_seedfinding.mccore.rand.ChunkRand;
+import com.cc_seedfinding.mccore.state.Dimension;
+import com.cc_seedfinding.mccore.util.pos.CPos;
+import com.cc_seedfinding.mccore.version.MCVersion;
+import com.cc_seedfinding.mccore.version.UnsupportedVersion;
+import com.cc_seedfinding.mccore.version.VersionMap;
+
+public class Fortress extends UniformStructure<Fortress> {
+
+	public static final VersionMap<Config> CONFIGS = new VersionMap<Config>()
+		//This is there as reference, it doesn't actually use regions prior to 1.16.
+		.add(MCVersion.v1_8, new Config(16, 8, -1))
+		.add(MCVersion.v1_16, new Config(30, 4, 30084232))
+		.add(MCVersion.v1_16_1, new Config(27, 4, 30084232));
+
+	public Fortress(MCVersion version) {
+		super(CONFIGS.getAsOf(version), version);
+	}
+
+	public Fortress(Config config, MCVersion version) {
+		super(config, version);
+
+		if(this.getVersion().isOlderThan(MCVersion.v1_16)) {
+			throw new UnsupportedVersion(this.getVersion(), "fortress regions");
+		}
+	}
+
+	public static String name() {
+		return "fortress";
+	}
+
+	@Override
+	public boolean canStart(Data<Fortress> data, long structureSeed, ChunkRand rand) {
+		if(this.getVersion().isOlderThan(MCVersion.v1_16)) {
+			rand.setWeakSeed(structureSeed, data.chunkX, data.chunkZ, this.getVersion());
+			rand.nextInt();
+			if(rand.nextInt(3) != 0) return false;
+			if(data.chunkX != (data.chunkX & ~15) + rand.nextInt(8) + 4) return false;
+			return data.chunkZ == (data.chunkZ & ~15) + rand.nextInt(8) + 4;
+		}
+
+		return super.canStart(data, structureSeed, rand) && rand.nextInt(5) < 2;
+	}
+
+	@Override
+	public CPos getInRegion(long structureSeed, int regionX, int regionZ, ChunkRand rand) {
+		if(this.getVersion().isOlderThan(MCVersion.v1_16)) {
+			rand.setWeakSeed(structureSeed, regionX << 4, regionZ << 4, this.getVersion());
+			rand.nextInt();
+			if(rand.nextInt(3) != 0) return null;
+			return new CPos((regionX << 4) + rand.nextInt(8) + 4, (regionZ << 4) + rand.nextInt(8) + 4);
+		}
+
+		CPos fortress = super.getInRegion(structureSeed, regionX, regionZ, rand);
+		return rand.nextInt(5) < 2 ? fortress : null;
+	}
+
+	@Override
+	public boolean canSpawn(int chunkX, int chunkZ, BiomeSource source) {
+		int x = this.getVersion().isOlderThan(MCVersion.v1_16) ? (chunkX << 4) + 9 : (chunkX << 2) + 2;
+		int z = this.getVersion().isOlderThan(MCVersion.v1_16) ? (chunkZ << 4) + 9 : (chunkZ << 2) + 2;
+		return this.isValidBiome(this.getVersion().isOlderThan(MCVersion.v1_16)
+			? source.getBiome(x, 0, z) : source.getBiomeForNoiseGen(x, 0, z));
+	}
+
+	@Override
+	public Dimension getValidDimension() {
+		return Dimension.NETHER;
+	}
+
+	@Override
+	public boolean isValidBiome(Biome biome) {
+		return biome == Biomes.BASALT_DELTAS || biome == Biomes.CRIMSON_FOREST || biome == Biomes.NETHER_WASTES
+			|| biome == Biomes.SOUL_SAND_VALLEY || biome == Biomes.WARPED_FOREST;
+	}
+
+}
